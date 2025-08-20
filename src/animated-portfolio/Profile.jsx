@@ -113,16 +113,16 @@ const AboutCompany = () => {
           {/* Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* WHO WE ARE */}
-            <motion.div className="bg-dark-800/60 backdrop-blur-md p-4  shadow-xl" variants={itemVariants}>
-              <motion.h3 className="text-lg md:text-xl font-bold text-blue-400 mb-4 flex items-center gap-2"><Users className="w-5 h-5" /> WHO WE ARE</motion.h3>
-              <motion.ul className="space-y-3 text-gray-300 text-sm sm:text-base leading-relaxed">
+            <motion.div className="bg-dark-800/60 backdrop-blur-md p-1 rounded-2xl border border-blue-900/40 shadow-xl" variants={itemVariants}>
+              <motion.h3 className="text-lg md:text-xl font-bold text-blue-400 mb-4 flex items-center gap-0"><Users className="w-5 h-5" /> WHO WE ARE</motion.h3>
+              <motion.ul className="space-y-1 text-gray-300 text-sm sm:text-base leading-relaxed">
                 {[{text:"We’re a passionate tech team building future-ready IT solutions: consulting, apps, testing, and AI.",desktop:"We're a team of passionate tech professionals focused on building a better future through smart and modern IT solutions. We offer IT consulting, website & mobile app development, software maintenance/testing, and AI integration.",icon:<Users className="w-4 h-4 text-purple-400"/>},
                   {text:"We use modern technology with agile methods to deliver quality projects on time.",desktop:"We use the latest technology to build strong, flexible solutions for business needs. We follow agile and client-centric approaches to ensure every project meets deadlines without compromising quality.",icon:<Code className="w-4 h-4 text-green-400"/>},
                   {text:"We provide IT training & placements to help students and startups grow.",desktop:"We provide IT training and placement support to help people get real-world skills and start their careers. Whether supporting students or helping startups grow, Sklassics turns ideas into reality and makes technology work for everyone.",icon:<GraduationCap className="w-4 h-4 text-yellow-400"/>},
                   {text:"We research emerging tech & build future-ready solutions for clients.",desktop:"Our team continuously researches emerging technologies to keep solutions future-ready and competitive. We believe in long-term partnerships, offering ongoing support and optimization to help clients adapt and scale effortlessly.",icon:<Rocket className="w-4 h-4 text-pink-400"/>}
                 ].map((item, index) => (
-                  <motion.li key={index} className="flex items-start gap-3 p-3 ">
-                    <motion.div className="p-2 ">{item.icon}</motion.div>
+                  <motion.li key={index} className="flex items-start gap-0 p-0 rounded-lg bg-dark-700/30 border border-gray-700/30">
+                    <motion.div className="p-0 rounded-full bg-purple-500/20 border border-purple-500/30">{item.icon}</motion.div>
                     <span className="block sm:hidden">{item.text}</span>
                     <span className="hidden sm:block">{item.desktop}</span>
                   </motion.li>

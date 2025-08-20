@@ -111,7 +111,7 @@ const AboutCompany = () => {
           </motion.div>
 
           {/* Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
             {/* WHO WE ARE */}
             <motion.div className="bg-dark-800/60 backdrop-blur-md p-1 rounded-2xl border border-blue-900/40 shadow-xl" variants={itemVariants}>
               <motion.h3 className="text-lg md:text-xl font-bold text-blue-400 mb-4 flex items-center gap-0"><Users className="w-5 h-5" /> WHO WE ARE</motion.h3>

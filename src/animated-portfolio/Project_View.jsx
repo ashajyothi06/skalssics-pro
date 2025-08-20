@@ -86,24 +86,36 @@ const styles = `
   .divider{height:1px;background:linear-gradient(90deg,transparent,rgba(168,85,247,.35),transparent);border:none;margin:6px 0 12px}
 
   /* Hero */
-  .hero{position:relative;border-radius:16px;overflow:hidden;border:1px solid var(--border)}
-  .hero-inner{position:relative;aspect-ratio:16/9;background:#050505}
-  .slide{position:absolute;inset:0;opacity:0;transition:opacity .45s ease}
-  .slide.active{opacity:1}
-  .slide img{width:100%;height:100%;display:block;object-fit:cover}
-  .fade-shadow{position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg, rgba(0,0,0,0.35), rgba(0,0,0,0) 32%, rgba(0,0,0,0) 68%, rgba(0,0,0,0.55))}
-  .hero-info{position:absolute;left:16px;bottom:16px;padding:10px 12px;border-radius:12px;background:#0000008a;border:1px solid var(--border);max-width:min(560px,80%)}
-  .hero-title{margin:0 0 4px;font-weight:800}
-  .hero-desc{margin:0;color:var(--muted)}
-  .hero-cta{position:absolute;left:16px;top:16px;display:flex;gap:8px;flex-wrap:wrap}
-  .pill{padding:8px 12px;border:1px solid var(--border);border-radius:999px;background:#0a0a0a;color:var(--text);font-weight:800;cursor:pointer}
-  .pill.filled{background:linear-gradient(135deg,var(--purple),var(--purple-2));border-color:transparent}
-  .nav{position:absolute;inset:0;display:flex;align-items:center;justify-content:space-between;padding:0 8px}
-  .nav button{width:42px;height:42px;border-radius:999px;border:1px solid var(--border);background:transparent;color:var(--purple);
-    cursor:pointer;font-weight:800;transition: box-shadow .2s ease, transform .12s ease}
-  .nav button:hover{box-shadow:0 0 0 3px rgba(168,85,247,.2), 0 10px 28px rgba(0,0,0,.45)}
-  .progress{position:absolute;left:0;right:0;bottom:0;height:3px;background:rgba(255,255,255,.06)}
-  .bar{width:0;height:100%;background:linear-gradient(90deg,var(--purple),var(--purple-2));transition:width .1s linear}
+.hero{position:relative;border-radius:16px;overflow:hidden;border:1px solid var(--border)}
+.hero-inner{position:relative;aspect-ratio:16/9;background:#050505}
+.slide{position:absolute;inset:0;opacity:0;transition:opacity .45s ease}
+.slide.active{opacity:1}
+.slide img{width:100%;height:100%;display:block;object-fit:cover}
+.fade-shadow{position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg, rgba(0,0,0,0.35), rgba(0,0,0,0) 32%, rgba(0,0,0,0) 68%, rgba(0,0,0,0.55))}
+.hero-info{position:absolute;left:16px;bottom:16px;padding:10px 12px;border-radius:12px;background:#0000008a;border:1px solid var(--border);max-width:min(560px,80%)}
+.hero-title{margin:0 0 4px;font-weight:800}
+.hero-desc{margin:0;color:var(--muted)}
+.hero-cta{position:absolute;left:16px;top:16px;display:flex;gap:8px;flex-wrap:wrap}
+.pill{padding:8px 12px;border:1px solid var(--border);border-radius:999px;background:#0a0a0a;color:var(--text);font-weight:800;cursor:pointer}
+.pill.filled{background:linear-gradient(135deg,var(--purple),var(--purple-2));border-color:transparent}
+.nav{position:absolute;inset:0;display:flex;align-items:center;justify-content:space-between;padding:0 8px}
+.nav button{width:42px;height:42px;border-radius:999px;border:1px solid var(--border);background:transparent;color:var(--purple);
+  cursor:pointer;font-weight:800;transition: box-shadow .2s ease, transform .12s ease}
+.nav button:hover{box-shadow:0 0 0 3px rgba(168,85,247,.2), 0 10px 28px rgba(0,0,0,.45)}
+.progress{position:absolute;left:0;right:0;bottom:0;height:3px;background:rgba(255,255,255,.06)}
+.bar{width:0;height:100%;background:linear-gradient(90deg,var(--purple),var(--purple-2));transition:width .1s linear}
+
+/* 📱 Mobile Adjustments for Hero */
+@media (max-width:640px){
+  .hero-inner{
+    aspect-ratio: 1/1;       /* make hero square */
+    max-height: 70vh;        /* prevent overflow */
+  }
+  .slide img{
+    object-fit: contain;     /* show full image without cropping */
+    background: #000;        /* black background for letterboxing */
+  }
+}
 
   /* Thumbnails: always visible & mobile-friendly */
   .thumbs{display:flex;gap:8px;overflow:auto;padding:8px 10px 0;scroll-snap-type:x mandatory}

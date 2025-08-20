@@ -10,6 +10,8 @@ import ScrollToTop from "./ScrollToTop";
 import "./index.css";
 
 
+
+
 import HanumanCarDisplay from "./new/Projects/HanumanCarDisplay";
 import TutorsDisplay from "./new/Projects/TutorsDisplay";
 import ItTrainingDisplay from "./new/Projects/ItTrainingDisplay";
@@ -40,6 +42,7 @@ function App() {
           <Route path='/AiInterview' element={<AiInterviewDisplay/>}/>
           <Route path='/loan' element={<LoanDisplay/>}/>
           {/* <Route path=' /projectlink' element={<Projectlink />}/> */}
+          
 
           
         </Routes>

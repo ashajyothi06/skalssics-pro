@@ -1,6 +1,7 @@
 import React from 'react';
 import DynamicTimestamp from '../components/ui/DynamicTimeStamp';
 
+
 const Projects = () => {
   return (
     <>
@@ -151,6 +152,7 @@ const Projects = () => {
 
           <div className="text-xs text-zinc-600 mt-6">ACTIVE</div>
           <DynamicTimestamp />
+          
         </div>
       </div>
     </>

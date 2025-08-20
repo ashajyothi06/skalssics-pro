@@ -2039,6 +2039,7 @@ import StickyScrollCards from './StickyScollCards';
 import AboutUsSection from './AboutUsSection';
 import WorkShowcase from "../animated-portfolio/WorkShowcase";
 import Profile from './Profile';
+import ProjectViewNew from '../animated-portfolio/Project_View';
 
 const InteractiveBackground = () => {
   return (
@@ -2591,6 +2592,9 @@ const Home = () => {
 
       <div id="projects" className="scroll-mt-80">
         <StickyScrollCards />
+      </div>
+      <div id="project_view" className="scroll-mt-20">
+        <ProjectViewNew/>
       </div>
 
       <div id="about" className="scroll-mt-20">

@@ -263,60 +263,13 @@ export default function AboutMe() {
                         >
                             <div className="absolute top-0 bottom-0 left-0 w-1.5 rounded-md bg-gradient-to-b from-fuchsia-500 via-purple-500 to-blue-500" />
 
-                            {/* Year & Read Button */}
-                            <div className="flex flex-col items-center w-24 shrink-0 relative z-10">
-                                <div
-                                    className="w-3 h-3 bg-fuchsia-600 rounded-full border-2 border-black z-20"
-                                    style={{
-                                        position: "absolute",
-                                        left: "calc(50% - 0.375rem)",
-                                        top: "0.75rem",
-                                    }}
-                                />
-                                <div className="text-xl font-bold text-white mt-4">
-                                    {item.year}
-                                </div>
-                                <button
-                                    className="mt-4 bg-fuchsia-700 hover:bg-fuchsia-600 text-white text-xs px-4 py-1 rounded-full transition flex items-center gap-1"
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        toggleDetails(index);
-                                    }}
-                                >
-                                    <BookOpen size={14} />
-                                    {showDetails[index] ? "Less" : "Read"}
-                                </button>
-                            </div>
-
-                            {/* Detail Card */}
-                            <div className="flex-1 bg-white/5 backdrop-blur-md border border-white/10 rounded-xl p-6 relative z-10">
-                                <div className="flex justify-between items-start">
-                                    <h3
-                                        className="text-lg sm:text-xl font-semibold text-white mb-1 hover:text-fuchsia-400 transition cursor-pointer"
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            toggleDetails(index);
-                                        }}
-                                    >
-                                        {item.title}
-                                    </h3>
-                                </div>
-                                <p className="text-sm text-gray-400">{item.company}</p>
-                                {showDetails[index] && (
-                                    <p className="text-sm text-gray-300 mt-4">
-                                        {item.details}
-                                    </p>
-                                )}
-                            </div>
+                            
+                           
                         </div>
                     ))}
                 </div>
 
-                {/* Timestamp */}
-                <div className="mt-12 text-xs text-gray-500 flex justify-between">
-                    <span>ACTIVE</span>
-                    <DynamicTimestamp />
-                </div>
+               
             </div>
         </div>
     );

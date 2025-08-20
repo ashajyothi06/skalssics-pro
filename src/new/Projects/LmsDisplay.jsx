@@ -1,982 +1,1020 @@
-import React, { useState, useRef } from "react";
-import lmsHero from "../../assets/lms.png"; 
-import { motion, AnimatePresence } from "framer-motion";
-import { FaArrowLeft, FaArrowRight, FaRegSquare, FaRegUser, FaArrowsAltH } from "react-icons/fa";
-import { 
-  LucideSearch, 
-  LucideUsers, 
-  LucideBarChart2, 
-  LucideBell, 
-  LucideShield, 
-  LucideDownload, 
-  LucideClock, 
-  LucideMessageCircle, 
-  LucideLayoutDashboard, 
-  LucideLink 
-} from 'lucide-react';
-import Footer from "../../animated-portfolio/Footer";
+// src/project_view_new.jsx — Advanced Home v3
+// Enhanced header animations & alignment + top carousel + rich descriptions (single-file, no deps)
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import lms1 from '../../assets/lms1.jpg';
+import lms2 from '../../assets/lms2.jpg';
 
+/* ---------- Styles (inline) ---------- */
+const styles = `
+  :root {
+    --bg:#000; --panel:#0b0b0b; --text:#f6f3ff; --muted:#b7a9d9;
+    --purple:#a855f7; --purple-2:#7c3aed; --border:rgba(168,85,247,0.35);
+    --shadow:0 30px 80px rgba(0,0,0,.65);
+    --success:#22c55e; --warning:#eab308; --danger:#ef4444;
+  }
+  *{box-sizing:border-box}
+  html,body,#root{height:100%}
+  body{margin:0;background:#000;color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial}
 
-const projectImages = [
- 
-  {
-    src: "https://images.unsplash.com/photo-1563986768609-322da13575f3?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&h=900",
-    title: "Your 24/7 Tutor (Who Never Judges)",
-    alt: "Macbook with VS Code and terminal windows",
-    style: { width: '100%', height: '100vh', objectFit: 'cover' }
-  }, 
- 
-  {
-    src: "https://images.unsplash.com/photo-1573164713988-8665fc963095?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&h=900",
-    title: "Turn ‘I Think I Know’ Into ‘I’m Certified!’",
-    alt: "CI/CD workflow visualization on dark screen",
-    style: { width: '100%', height: '100vh', objectFit: 'cover' }
-  },
-  {
-        src: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&h=900",
-        title: "Skip the Lecture, Keep the Knowledge",
-        alt: "Group of developers working together on laptops",
-        style: { width: '100%', height: '100vh', objectFit: 'cover' }
-      },
-  
-];
-
-const RadialMenu = () => {
-  const radius = 100; // Reduced radius for mobile
-  const [isOpen, setIsOpen] = useState(false);
-  const [hoveredItem, setHoveredItem] = useState(null);
-
-  const handleClick = (href, e) => {
-    e.preventDefault();
-    setIsOpen(false);
-
-    setTimeout(() => {
-      const id = href.replace("#", "");
-      const el = document.getElementById(id);
-      if (el) {
-        const yOffset = -40;
-        const y = el.getBoundingClientRect().top + window.pageYOffset + yOffset;
-        window.scrollTo({ top: y, behavior: "smooth" });
-      }
-    }, 400);
-  };
-
-  const menuItems = [
-    { label: "Profile", angle: 0, href: "#profile", icon: "👤" },
-    { label: "Work", angle: 90, href: "#work", icon: "💼" },
-    { label: "Projects", angle: 180, href: "#projects", icon: "🚀" },
-    { label: "About", angle: 270, href: "#about", icon: "ℹ️" },
-  ];
-
-  return (
-    <div className="fixed top-4 right-4 z-[100] text-white">
-      <motion.div
-        className="relative w-[60px] h-[60px] md:w-[80px] md:h-[80px] rounded-full border border-primary-800 flex items-center justify-center"
-        animate={{ rotate: [0, 360] }}
-        transition={{ repeat: Infinity, duration: 30, ease: "linear" }}
-      >
-        <motion.button
-          onClick={() => setIsOpen(!isOpen)}
-          className="w-[50px] h-[50px] md:w-[60px] md:h-[60px] rounded-full bg-gradient-to-br from-purple-900/80 via-indigo-900/80 to-blue-900/80 border border-purple-500 text-xs font-bold backdrop-blur-sm flex items-center justify-center text-white interactive-glow"
-          whileHover={{ 
-            scale: 1.05, 
-            boxShadow: "0 0 15px rgba(168, 85, 247, 0.5)",
-          }}
-          whileTap={{ scale: 0.98 }}
-          animate={{ 
-            boxShadow: ["0 0 0px rgba(168, 85, 247, 0.3)", "0 0 10px rgba(168, 85, 247, 0.5)", "0 0 0px rgba(168, 85, 247, 0.3)"],
-          }}
-          transition={{ duration: 2, repeat: Infinity }}
-        >
-          <span className="animate-text-shimmer">{isOpen ? "CLOSE" : "MENU"}</span>
-        </motion.button>
-      </motion.div>
-
-      <AnimatePresence>
-        {isOpen && (
-          <>
-            <motion.div
-              className="fixed inset-0 bg-dark-950/90 backdrop-blur-md z-[40]"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.4 }}
-              onClick={() => setIsOpen(false)}
-            />
-
-            <motion.div
-              className="fixed top-8 right-8 w-[220px] h-[220px] md:w-[280px] md:h-[280px] rounded-full border border-primary-500 z-[50] shadow-glow-purple-lg"
-              initial={{ opacity: 0, scale: 0 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0 }}
-              transition={{ duration: 0.5 }}
-            >
-              <div className="absolute inset-0 bg-[conic-gradient(from_0deg,_#a855f7_0deg,_#a855f7_10deg,_transparent_10deg,_transparent_72deg,_#a855f7_72deg,_#a855f7_82deg,_transparent_82deg)] opacity-40 rounded-full animate-spin-slow pointer-events-none" />
-              
-              {menuItems.map((item) => {
-                const angleRad = (item.angle * Math.PI) / 180;
-                const x = radius * Math.cos(angleRad);
-                const y = radius * Math.sin(angleRad);
-
-                return (
-                  <div
-                    key={item.label}
-                    className="absolute z-[60]"
-                    style={{
-                      left: `calc(50% + ${x}px - 30px)`,
-                      top: `calc(50% - ${y}px - 30px)`,
-                    }}
-                  >
-                    <motion.div 
-                      className="relative w-[60px] h-[60px] rounded-full border border-[#6b21a8]/60 flex items-center justify-center"
-                      onHoverStart={() => setHoveredItem(item.label)}
-                      onHoverEnd={() => setHoveredItem(null)}
-                    >
-                      <motion.a
-                        href={item.href}
-                        className="w-[50px] h-[50px] rounded-full bg-gradient-to-br from-purple-900/80 via-indigo-900/80 to-blue-900/80 border border-purple-500 text-white font-bold text-xs backdrop-blur-sm flex flex-col items-center justify-center cursor-pointer z-[70] interactive-glow"
-                        whileHover={{ 
-                          scale: 1.1, 
-                          boxShadow: "0 0 15px rgba(168, 85, 247, 0.5)",
-                        }}
-                        whileTap={{ scale: 0.98 }}
-                        animate={{ 
-                          boxShadow: hoveredItem === item.label 
-                            ? "0 0 20px rgba(168, 85, 247, 0.8)"
-                            : ["0 0 0px rgba(168, 85, 247, 0.3)", "0 0 10px rgba(168, 85, 247, 0.5)", "0 0 0px rgba(168, 85, 247, 0.3)"],
-                        }}
-                        transition={{ duration: 2, repeat: Infinity }}
-                        onClick={(e) => handleClick(item.href, e)}
-                        tabIndex={isOpen ? 0 : -1}
-                        aria-label={item.label}
-                      >
-                        <span className="text-lg mb-1">{item.icon}</span>
-                        <span className="animate-text-shimmer text-xs">{item.label}</span>
-                      </motion.a>
-                    </motion.div>
-                  </div>
-                );
-              })}
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
-    </div>
-  );
-};
-
-
-function FullScreenCarousel() {
-  const [current, setCurrent] = React.useState(0);
-
-  React.useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrent((c) => (c === projectImages.length - 1 ? 0 : c + 1));
-    }, 4000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const prev = () => setCurrent((c) => (c === 0 ? projectImages.length - 1 : c - 1));
-  const next = () => setCurrent((c) => (c === projectImages.length - 1 ? 0 : c + 1));
-
-  return (
-    <section className="relative w-full h-screen flex items-center justify-center bg-[#1a1333] overflow-hidden">
-      <div className="absolute inset-0 z-0">
-        <div className="w-full h-full bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-20" />
-      </div>
-      
-      <RadialMenu />
-
-      <img
-        src={projectImages[current].src}
-        alt={projectImages[current].title}
-        className="absolute inset-0 w-full h-full object-cover object-center transition-all duration-500 z-0"
-        style={{ filter: "brightness(0.7)" }}
-      />
-      <div className="relative z-10 flex pt-60 flex-col items-center justify-center w-full h-full">
-        <h3 className="text-3xl md:text-5xl font-bold text-white drop-shadow mb-6  px-8 py-4 rounded-2xl">
-         {projectImages[current].title}
-        </h3>
-        <div className="flex justify-center gap-3 mt-8">
-          {projectImages.map((_, idx) => (
-            <button
-              key={idx}
-              onClick={() => setCurrent(idx)}
-              className={`w-4 h-4 rounded-full border-2 border-purple-400 ${
-                idx === current ? "bg-purple-400" : "bg-purple-900"
-              }`}
-              aria-label={`Go to slide ${idx + 1}`}
-            />
-          ))}
-        </div>
-      </div>
-      <div className="absolute inset-0 bg-gradient-to-t from-[#1a1333] via-transparent to-[#1a1333]/60 pointer-events-none" />
-    </section>
-  );
+  /* Wrapper ensures full height + centered */
+.wrap {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 28px;
 }
 
-const AuthHero = () => {
-  const handleExploreCourses = () => {
-    window.location.href = "https://sklassics-lms.com/";
+/* Panel base */
+.panel {
+  width: min(1280px, 95vw);
+  background: #0b0b0b;
+  border: 1px solid var(--border);
+  border-radius: 50px;
+  box-shadow: var(--shadow);
+  padding: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Gradient top accent */
+.panel::before {
+  content:"";
+  position:absolute;
+  left:0; right:0; top:0;
+  height:2px;
+  background:linear-gradient(90deg, var(--purple), var(--purple-2));
+  opacity:.9;
+}
+
+/* -----------------------------------
+   Device simulation wrapper classes
+----------------------------------- */
+.panel.desktop {
+  /* Desktop wide: keep original large scaling */
+  width: min(2000px, 90vw);
+}
+
+.panel.tablet {
+  /* Tablet friendly width */
+  width: min(900px, 94vw);
+  border-radius: 20px;
+}
+
+.panel.mobile {
+  /* Mobile narrow version */
+  width: min(420px, 96vw);
+  border-radius: 24px;
+}
+
+/* -----------------------------------
+   Automatic Responsive Breakpoints
+----------------------------------- */
+
+/* Tablets (≤1024px but >640px) */
+@media (max-width:1024px) {
+  .panel {
+    width: 95vw;           /* Fill most of screen width */
+    border-radius: 18px;
+  }
+  .wrap {
+    padding: 20px;
+  }
+}
+
+/* Mobiles (≤640px) */
+@media (max-width:640px) {
+  .panel {
+    width: 98vw;           /* nearly full screen */
+    border-radius: 16px;   /* smaller radius for compact look */
+  }
+  .wrap {
+    padding: 12px;
+  }
+}
+
+
+  /* Topbar */
+  .topbar{position:sticky;top:0;z-index:20;background:linear-gradient(180deg,#0b0b0b 70%, rgba(11,11,11,0));
+    border-bottom:1px solid var(--border);backdrop-filter:saturate(120%)}
+  .tb-inner{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 18px}
+  .brand{display:flex;align-items:center;gap:10px}
+  .logo{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,var(--purple),var(--purple-2));
+    box-shadow:0 6px 18px rgba(168,85,247,.35)}
+  .brand h1{margin:0;font-size:18px;letter-spacing:.2px}
+  .navlinks{display:flex;gap:8px;flex-wrap:wrap;overflow:auto}
+  .alink{padding:8px 12px;border-radius:999px;border:1px solid var(--border);background:#0a0a0a;color:var(--muted);
+    cursor:pointer;font-weight:700;white-space:nowrap}
+  .alink:hover{box-shadow:0 0 0 3px rgba(168,85,247,.15)}
+
+  /* Header area (enhanced) */
+  .header{padding:18px 18px 8px}
+  .header-grid{display:grid;grid-template-columns:1.2fr auto;align-items:end;gap:18px}
+  @media (max-width:860px){ .header-grid{grid-template-columns:1fr;align-items:stretch;gap:12px} }
+
+  .title{margin:0;letter-spacing:-.02em;display:flex;align-items:center;gap:10px}
+  .title .ink{font-size:clamp(26px,3.4vw,38px);background:linear-gradient(90deg,#fff, #d7c9ff 40%, #b48cff 75%, #fff);
+    -webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 6px 28px rgba(168,85,247,.18))}
+  .title::after{content:"";height:2px;width:0;display:block;background:linear-gradient(90deg,var(--purple),var(--purple-2));
+    border-radius:2px;margin-top:6px;transition:width .6s ease .1s}
+  .intro.in .title::after{width:92%}
+
+  .pip{display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--purple);
+    box-shadow:0 0 0 0 rgba(168,85,247,.45);animation:pulse 2.2s infinite ease-in-out}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(168,85,247,.45)}70%{box-shadow:0 0 0 10px rgba(168,85,247,0)}100%{box-shadow:0 0 0 0 rgba(168,85,247,0)}}
+
+  .lead{margin:10px 0 0;color:var(--muted);max-width:70ch;line-height:1.6;text-wrap:balance}
+  .lead strong,.hl{background:linear-gradient(90deg, rgba(168,85,247,.18), rgba(168,85,247,.07));
+    border:1px solid var(--border);padding:2px 6px;border-radius:8px;color:#eae3ff}
+  .lead-rail{position:relative;padding-left:14px}
+  .lead-rail::before{content:"";position:absolute;left:0;top:.35em;bottom:.35em;width:3px;border-radius:2px;
+    background:linear-gradient(180deg,var(--purple),var(--purple-2))}
+
+  /* Staggered reveal */
+  .intro .title, .intro .lead, .toolbar{opacity:0;transform:translateY(10px)}
+  .intro.in .title{opacity:1;transform:none;transition:opacity .5s ease, transform .5s ease}
+  .intro.in .lead{opacity:1;transform:none;transition:opacity .6s ease .08s, transform .6s ease .08s}
+  .toolbar.in{opacity:1;transform:none;transition:opacity .6s ease .16s, transform .6s ease .16s}
+  @media (prefers-reduced-motion: reduce){
+    .intro .title, .intro .lead, .toolbar{opacity:1;transform:none}
+    .title::after{transition:none}
+    .pip{animation:none}
+  }
+
+  .toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .control{display:flex;align-items:center;gap:8px;background:#0a0a0a;border:1px solid var(--border);
+    border-radius:12px;padding:8px 10px}
+  .control input,.control select{background:transparent;border:none;color:var(--text);outline:none}
+  .control input::placeholder{color:#9a8cc2}
+  .btn{padding:8px 12px;border-radius:12px;border:1px solid var(--border);background:transparent;color:var(--purple);
+    cursor:pointer;font-weight:700}
+  .btn:hover{box-shadow:0 0 0 3px rgba(168,85,247,.15), 0 8px 24px rgba(0,0,0,.4)}
+  .badge{padding:6px 10px;border:1px solid var(--border);border-radius:999px;background:#0a0a0a;color:var(--muted);font-weight:700}
+
+  /* Section shells */
+  .section{padding:12px 18px 18px}
+  .section + .section{padding-top:8px}
+  .section-h{display:flex;align-items:center;justify-content:space-between;margin:6px 0 10px}
+  .section-h h3{margin:0;font-size:18px;letter-spacing:.3px}
+  .section-h .hint{color:var(--muted);font-size:13px}
+  .divider{height:1px;background:linear-gradient(90deg,transparent,rgba(168,85,247,.35),transparent);border:none;margin:6px 0 12px}
+
+  /* TOP CAROUSEL */
+  .carousel{position:relative;border-radius:16px;border:1px solid var(--border);background:#0a0a0a;overflow:hidden}
+  .car-grid{display:grid;grid-template-columns:7fr 5fr;gap:12px;padding:12px}
+  .track{display:flex;gap:12px;overflow:auto;padding:4px;scroll-snap-type:x mandatory;scroll-behavior:smooth}
+  .c-card{min-width:clamp(260px,30vw,380px);aspect-ratio:16/10;position:relative;border-radius:14px;overflow:hidden;border:1px solid var(--border);
+    background:#080808;scroll-snap-align:center;cursor:pointer;transition:transform .25s ease, box-shadow .3s ease}
+  .c-card:hover{transform:translateY(-2px); box-shadow:0 16px 42px rgba(0,0,0,.5), 0 0 0 3px rgba(168,85,247,.18) inset}
+  .c-card.active{outline:2px solid var(--purple)}
+  .c-img{position:absolute;inset:0}
+  .c-img img{width:100%;height:100%;object-fit:cover}
+  .c-cap{position:absolute;left:0;right:0;bottom:0;padding:10px 12px;background:linear-gradient(180deg,transparent,rgba(0,0,0,.85))}
+  .c-title{margin:0;font-weight:900}
+  .c-desc{margin:2px 0 0;font-size:12px;color:var(--muted)}
+  .c-tag{position:absolute;left:10px;top:10px;padding:4px 8px;border-radius:999px;background:#00000090;border:1px solid var(--border);font-size:12px;color:var(--purple);font-weight:700}
+
+  .aside{border:1px solid var(--border);border-radius:14px;padding:12px;background:#0a0a0a;display:grid;grid-template-rows:auto 1fr auto;gap:8px}
+  .aside h4{margin:0 0 2px}
+  .meta{display:flex;gap:8px;flex-wrap:wrap}
+  .chip{padding:8px 12px;border-radius:999px;border:1px solid var(--border);background:transparent;color:var(--purple);
+    cursor:pointer;font-weight:700;letter-spacing:.2px;transition: box-shadow .2s ease, transform .12s ease}
+  .chip:hover{box-shadow:0 0 0 3px rgba(168,85,247,.15), 0 8px 24px rgba(0,0,0,.4)}
+  .chip:active{transform: translateY(1px) scale(.98)}
+  .clamp-4{display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+  .read{background:transparent;border:1px solid var(--border);border-radius:10px;padding:6px 10px;color:var(--muted);cursor:pointer}
+
+  .car-nav{position:absolute;inset:0;display:flex;align-items:center;justify-content:space-between;pointer-events:none}
+  .car-btn{pointer-events:auto;width:42px;height:42px;border-radius:999px;border:1px solid var(--border);background:#0a0a0a;color:var(--purple);font-weight:800;margin:0 8px}
+  .dots{display:flex;gap:8px;justify-content:center;padding:8px}
+  .dot{width:8px;height:8px;border-radius:50%;background:transparent;border:1px solid var(--border);opacity:.9}
+  .dot.active{background:var(--purple); border-color:var(--purple)}
+
+  @media (max-width: 900px){ .car-grid{grid-template-columns:1fr} }
+
+  /* Hero slider */
+  .hero{position:relative;border-radius:16px;overflow:hidden;border:1px solid var(--border)}
+  .hero-inner{position:relative;aspect-ratio:16/9;background:#050505}
+  .slide{position:absolute;inset:0;opacity:0;transition:opacity .45s ease}
+  .slide.active{opacity:1}
+  .slide img{width:100%;height:100%;display:block;object-fit:cover}
+  .fade-shadow{position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg, rgba(0,0,0,0.35), rgba(0,0,0,0) 32%, rgba(0,0,0,0) 68%, rgba(0,0,0,0.55))}
+  .hero-info{position:absolute;left:16px;bottom:16px;padding:10px 12px;border-radius:12px;background:#0000008a;border:1px solid var(--border);max-width:min(560px,80%)}
+  .hero-title{margin:0 0 4px;font-weight:800}
+  .hero-desc{margin:0;color:var(--muted)}
+  .hero-cta{position:absolute;left:16px;top:16px;display:flex;gap:8px;flex-wrap:wrap}
+  .pill{padding:8px 12px;border:1px solid var(--border);border-radius:999px;background:#0a0a0a;color:var(--text);font-weight:800;cursor:pointer}
+  .pill.filled{background:linear-gradient(135deg,var(--purple),var(--purple-2));border-color:transparent}
+
+  .nav{position:absolute;inset:0;display:flex;align-items:center;justify-content:space-between;padding:0 8px}
+  .nav button{width:42px;height:42px;border-radius:999px;border:1px solid var(--border);background:transparent;color:var(--purple);
+    cursor:pointer;font-weight:800;transition: box-shadow .2s ease, transform .12s ease}
+  .nav button:hover{box-shadow:0 0 0 3px rgba(168,85,247,.2), 0 10px 28px rgba(0,0,0,.45)}
+  .nav button:active{transform: translateY(1px) scale(.98)}
+
+  .progress{position:absolute;left:0;right:0;bottom:0;height:3px;background:rgba(255,255,255,.06)}
+  .bar{width:0;height:100%;background:linear-gradient(90deg,var(--purple),var(--purple-2));transition:width .1s linear}
+
+  .thumbs{display:flex;gap:8px;overflow:auto;padding:8px 6px 0}
+  .thumb{min-width:110px;aspect-ratio:16/10;border-radius:10px;overflow:hidden;border:1px solid var(--border);opacity:.85;cursor:pointer;background:#0a0a0a;position:relative}
+  .thumb.active{opacity:1;border-color:var(--purple)}
+  .thumb img{width:100%;height:100%;object-fit:cover;display:block}
+  .thumb::after{content:attr(data-t);position:absolute;left:6px;bottom:6px;font-size:11px;padding:3px 6px;border-radius:8px;background:#000000a6;border:1px solid var(--border);color:var(--muted)}
+
+  /* Overview / Stats */
+  .stats{display:grid;grid-template-columns:repeat(12,1fr);gap:12px}
+  .stat{grid-column:span 3;background:#0a0a0a;border:1px solid var(--border);border-radius:14px;padding:12px}
+  .stat h4{margin:0 0 2px;font-size:14px;color:var(--muted)}
+  .stat p{margin:0;font-size:22px;font-weight:900}
+  .ok{color:var(--success)} .warn{color:var(--warning)} .bad{color:var(--danger)}
+  @media (max-width:900px){ .stat{grid-column:span 6} }
+  @media (max-width:640px){ .stat{grid-column:span 12} }
+
+  /* Sections grid */
+  .sections{display:grid;grid-template-columns:repeat(12,1fr);gap:12px}
+  .section-card{grid-column:span 4;background:#0a0a0a;border:1px solid var(--border);border-radius:14px;padding:12px;position:relative;overflow:hidden}
+  .section-card h4{margin:0 0 4px;display:flex;align-items:center;gap:8px}
+  .section-card p{margin:0;color:var(--muted)}
+  .section-card .act{position:absolute;right:12px;bottom:12px}
+  .section-card .act .btn{padding:6px 10px}
+  @media (max-width:900px){ .section-card{grid-column:span 6} }
+  @media (max-width:640px){ .section-card{grid-column:span 12} }
+
+  /* Grid Gallery */
+  .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:12px;margin-top:16px}
+  .grid.compact{gap:8px}
+  .card{position:relative;border:1px solid var(--border);border-radius:14px;overflow:hidden;cursor:pointer;background:#0a0a0a;transition: box-shadow .3s ease, transform .25s ease}
+  .card:hover{box-shadow:0 16px 42px rgba(0,0,0,.5), 0 0 0 3px rgba(168,85,247,.18) inset; transform: translateY(-2px)}
+  .card img{width:100%;height:100%;object-fit:cover;display:block}
+  .tag{position:absolute;left:10px;top:10px;padding:4px 8px;border-radius:999px;background:#00000090;border:1px solid var(--border);font-size:12px;color:var(--purple);font-weight:700}
+  .cap{position:absolute;left:0;right:0;bottom:0;padding:10px 12px;background:linear-gradient(180deg, transparent, rgba(0,0,0,.85))}
+  .cap .t{font-weight:800;margin:0}
+  .cap .d{margin:2px 0 0;font-size:12px;color:var(--muted)}
+
+  .span-6{grid-column:span 6} .span-4{grid-column:span 4} .span-8{grid-column:span 8} .span-12{grid-column:span 12}
+  .h-200{height:200px} .h-260{height:260px} .h-320{height:320px}
+
+  /* ---------- Responsive: automatic (CSS breakpoints) ---------- */
+  @media (max-width: 1024px){
+    .title .ink{font-size:clamp(24px,3.2vw,32px)}
+    .hero-inner{aspect-ratio:16/10}
+  }
+  @media (max-width: 900px){
+    .span-6{grid-column:span 12} .span-8{grid-column:span 12} .span-4{grid-column:span 6}
+    .h-320{height:260px}
+  }
+  @media (max-width: 640px){
+    .grid{grid-template-columns:repeat(6,1fr)}
+    .span-4{grid-column:span 6} .span-6{grid-column:span 6} .span-8{grid-column:span 6}
+    .thumbs{display:none} /* hide thumbs on small screens */
+    .hero-inner{aspect-ratio:1/1}
+    .nav button{width:38px;height:38px}
+    .control{padding:6px 8px}
+    .btn{padding:6px 9px}
+  }
+
+  /* ---------- Forced modes via .desktop / .mobile ---------- */
+  .panel.desktop .grid{grid-template-columns:repeat(12,1fr)}
+  .panel.desktop .thumbs{display:flex}
+  .panel.desktop .hero-inner{aspect-ratio:16/9}
+
+  .panel.mobile .grid{grid-template-columns:repeat(6,1fr)}
+  .panel.mobile .span-4{grid-column:span 6}
+  .panel.mobile .span-6{grid-column:span 6}
+  .panel.mobile .span-8{grid-column:span 6}
+  .panel.mobile .thumbs{display:none}
+  .panel.mobile .hero-inner{aspect-ratio:1/1}
+  .panel.mobile .title .ink{font-size:22px}
+  .panel.mobile .control{padding:6px 8px}
+  .panel.mobile .btn{padding:6px 9px}
+
+  /* Lightbox */
+  .lightbox{position:fixed;inset:0;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;z-index:50}
+  .lb-inner{width:min(1100px,92vw);max-height:88vh;background:#0b0b0b;border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);
+    overflow:hidden;display:grid;grid-template-rows:auto 1fr}
+  .lb-head{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border-bottom:1px solid var(--border)}
+  .lb-title{margin:0;font-weight:800}
+  .lb-close{cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--purple);border-radius:8px;padding:6px 10px;font-weight:800}
+  .lb-media{position:relative;background:#000;display:grid;place-items:center}
+  .lb-media img{max-width:100%;max-height:82vh;object-fit:contain}
+  .lb-nav{position:absolute;left:0;right:0;top:50%;display:flex;justify-content:space-between;transform:translateY(-50%);padding:0 8px}
+  .lb-btn{width:42px;height:42px;border-radius:999px;border:1px solid var(--border);background:transparent;color:var(--purple);font-weight:800}
+
+  /* Motion accessibility */
+  @media (prefers-reduced-motion: reduce){
+    .slide{transition:none}
+    .card{transition:none}
+    .nav button{transition:none}
+  }
+    /* -------- Responsive overrides for gallery -------- */
+@media (max-width:900px){
+  .grid{grid-template-columns:repeat(12,1fr)}
+  .grid .card{grid-column:span 6 !important; height:auto; min-height:200px}
+}
+
+@media (max-width:640px){
+  .grid{grid-template-columns:repeat(12,1fr)}
+  .grid .card{grid-column:span 12 !important; height:auto; min-height:200px}
+}
+  /* Desktop/Tablet: show normal nav */
+.desktop-nav { display: flex; }
+.mobile-nav { display: none; }
+
+/* Mobile: swap */
+@media (max-width:640px) {
+  .desktop-nav { display: none; }
+  .mobile-nav { display: block; position: relative; }
+  .hamburger {
+    font-size: 22px;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 6px 10px;
+    color: var(--purple);
+    cursor: pointer;
+  }
+    @media (max-width:640px){
+  .mobile-nav { display:block; }
+  .mobile-menu {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 335px;
+    max-width: 94vw;
+    height: 100vh;
+    background: #0b0b0b;
+    border-right: 1px solid var(--border);
+    z-index: 1050;
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    box-shadow: 0 10px 48px #000c;
+    transform: translateX(-100%);
+    transition: transform .35s cubic-bezier(.26,1,.32,1);
+  }
+  .mobile-menu.open { transform: translateX(0);}
+  .mobile-menu-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 18px 10px 18px;
+    border-bottom: 1px solid var(--border);
+    min-height: 56px;
+  }
+  .mobile-menu-logo {
+    display: flex;
+    align-items: center;
+    font-size: 24px;
+    color: #fff;
+    font-weight: 700;
+    gap: 8px;
+  }
+  .mobile-menu-logo img {
+    height: 32px; width: auto; margin-right:8px;
+  }
+  .close-btn {
+    background: none;
+    border: none;
+    font-size: 32px;
+    color: var(--muted);
+    cursor: pointer;
+    padding: 2px 8px; margin-left: auto;
+  }
+  .mobile-menu-items {
+    flex: 1; /* takes all space */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 32px;
+    padding: 40px 0 16px 0;
+  }
+  .mobile-menu-items .menu-link {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 21px;
+    text-align: center;
+    font-weight: 500;
+    padding: 8px 0;
+    width: 92%;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: background .18s,color .18s;
+  }
+  .mobile-menu-items .menu-link:hover {
+    background: rgba(168,85,247,0.10);
+    color: var(--purple);
+  }
+  .whatsapp-btn {
+    width: 85%;
+    margin: 10px auto 8px auto;
+    background: #25d366;
+    color: #222;
+    border: none;
+    border-radius: 10px;
+    font-size: 19px;
+    font-weight:700;
+    padding: 12px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    box-shadow: 0 2px 8px #18b5513a;
+    cursor: pointer;
+  }
+  .whatsapp-btn .wa-icon {
+    font-size: 22px;
+    margin-right: 4px;
+  }
+  .login-btn {
+    width: 92%;
+    margin: 8px auto 0 auto;
+    background: transparent;
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 18px;
+    font-weight: 500;
+    padding: 12px 0;
+    cursor: pointer;
+    transition: border .18s,color .18s;
+  }
+  .login-btn:hover {
+    color: var(--purple);
+    border-color: var(--purple);
+  }
+  .drawer-overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    z-index: 1000;
+  }
+}
+
+  .mobile-menu {
+    position: absolute;
+    items: center;
+    top: 110%;
+    right: 0;
+    background: #0b0b0b;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 8px;
+    z-index: 100;
+  }
+  .mobile-menu button {
+    background: none;
+    border: none;
+    color: var(--text);
+    text-align: left;
+    padding: 6px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  .mobile-menu button:hover {
+    background: rgba(168,85,247,0.12);
+  }
+}
+
+@media (max-width:640px) {
+  .mobile-pill-vertical {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    align-items: stretch;
+    padding: 30px 18px 16px 18px;
+    background: transparent;
+    width: 100%;
+  }
+  .pill-link {
+    padding: 12px 0;
+    border-radius: 999px;
+    border: 2px solid var(--border, #a855f7);
+    background: #181118;
+    color: #f6f3ff;
+    font-size: 18px;
+    font-weight: 700;
+    outline: none;
+    cursor: pointer;
+    width: 50%; /* full width in drawer */
+    height: 50%;
+    text-align: center;
+    margin: 0;
+    transition: background .18s, color .18s, border .15s;
+  }
+  .pill-link:hover,
+  .pill-link:focus {
+    color: var(--purple, #a855f7);
+    background: rgba(168,85,247,0.09);
+    border-color: var(--purple, #a855f7);
+  }
+}
+/* Hide by default */
+.mobile-pill-vertical {
+  display: none;
+}
+
+/* Show only on mobile screens */
+@media (max-width:640px) {
+  .mobile-pill-vertical {
+    display: flex;
+  }
+}
+
+`;
+
+/* ---------- Demo data ---------- */
+// Featured Images (4 premium showcase items)
+const FEATURED_IMGS = [
+  { 
+    title: "Dashboard",    
+    desc: "Live KPIs and overview", 
+    long: "Get a real-time pulse on KPIs, revenue, uptime, and operational health with drill-downs and alerting.", 
+    src: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=1600&auto=format&fit=crop", 
+    cat: "Overview" 
+  },
+  { 
+    title: "Analytics",    
+    desc: "Charts & deep insights", 
+    long: "Build interactive charts, compare cohorts, and export reports to CSV/PDF.", 
+    src: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=1600&auto=format&fit=crop", 
+    cat: "Analytics" 
+  },
+  { 
+    title: "CRM",          
+    desc: "Profiles & timeline",  
+    long: "Track user journeys and automate follow-ups with tags and activity streams.", 
+    src: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=1600&auto=format&fit=crop", 
+    cat: "Users" 
+  },
+  { 
+    title: "Tasks",        
+    desc: "Boards & sprints",     
+    long: "Plan sprints and visualize progress in Kanban views with SLA reminders.", 
+    src: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=1600&auto=format&fit=crop", 
+    cat: "Product" 
+  }
+];
+
+// Gallery Images (8+ different items)
+const GALLERY_IMGS = [
+  { 
+    title: "Collaboration",
+    desc: "Comments & mentions",  
+    long: "Centralize feedback and decision logs with inline comments.", 
+    src: "https://images.unsplash.com/photo-1529336953121-ad5a0d43d0d2?q=80&w=1600&auto=format&fit=crop", 
+    cat: "Collab" 
+  },
+  { 
+    title: "Reports",      
+    desc: "Export PDF/CSV",       
+    long: "Schedule report deliveries and keep stakeholders aligned.", 
+    src: "https://images.unsplash.com/photo-1531496681078-17f36b0d3c06?q=80&w=1600&auto=format&fit=crop", 
+    cat: "Analytics" 
+  },
+  { 
+    title: "Automation",   
+    desc: "Workflows & triggers", 
+    long: "Trigger workflows on events and notify teams.", 
+    src: "https://images.unsplash.com/photo-1545235617-9465d2a55698?q=80&w=1600&auto=format&fit=crop", 
+    cat: "Product" 
+  },
+  { 
+    title: "Settings",     
+    desc: "Roles & permissions",  
+    long: "Configure SSO, RBAC, and audit logs.", 
+    src: "https://images.unsplash.com/photo-1515879218367-8466d910aaa4?q=80&w=1600&auto=format&fit=crop", 
+    cat: "Users" 
+  },
+  { 
+    title: "Security",     
+    desc: "Access controls",       
+    long: "Manage permissions and security monitoring.", 
+    src: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=1600&auto=format&fit=crop", 
+    cat: "Security" 
+  },
+  { 
+    title: "Integrations", 
+    desc: "API & webhooks",       
+    long: "Connect with other tools using our REST API.", 
+    src: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=1600&auto=format&fit=crop", 
+    cat: "Dev" 
+  },
+  { 
+    title: "Notifications",
+    desc: "Alerts & reminders",
+    long: "Configure real-time notifications for your team",
+    src: "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?q=80&w=1600&auto=format&fit=crop",
+    cat: "Product"
+  },
+  { 
+    title: "Documentation",
+    desc: "Guides & tutorials",
+    long: "Access comprehensive product documentation",
+    src: "https://images.unsplash.com/photo-1501504905252-473c47e087f8?q=80&w=1600&auto=format&fit=crop",
+    cat: "Resources"
+  }
+];
+
+// Hero/Carousel Images (completely different set)
+const HERO_IMGS = [
+  { 
+    title: "Modern Interface", 
+    desc: "Sleek and intuitive design", 
+    src: lms1, 
+    cat: "Showcase" 
+  },
+  { 
+    title: "Powerful Analytics", 
+    desc: "Deep insights at your fingertips", 
+    src: lms2, 
+    cat: "Showcase" 
+  },
+  { 
+    title: "Team Collaboration", 
+    desc: "Work together seamlessly", 
+    src: "https://images.unsplash.com/photo-1529333166437-7750a6dd5a70?q=80&w=1600&auto=format&fit=crop", 
+    cat: "Showcase" 
+  },
+  { 
+    title: "Mobile Ready", 
+    desc: "Access anywhere on any device", 
+    src: "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?q=80&w=1600&auto=format&fit=crop", 
+    cat: "Showcase" 
+  }
+];
+
+const CATS = ["All", ...Array.from(new Set([...FEATURED_IMGS, ...GALLERY_IMGS].map(i => i.cat)))];
+const CAT_ICONS = { 
+  All: "⭐", 
+  Overview: "📊", 
+  Analytics: "📈", 
+  Users: "👥", 
+  Product: "🧩", 
+  Collab: "💬", 
+  Security: "🔒", 
+  Dev: "⚙️",
+  Resources: "📚",
+  Showcase: "🏆"
+};
+
+const SECTIONS = [
+  { key:"Overview",  icon:"📊", title:"Overview",  blurb:"At-a-glance KPIs and status across your work." },
+  { key:"Analytics", icon:"📈", title:"Analytics", blurb:"Dashboards, charts, and reports to explore trends." },
+  { key:"Users",     icon:"👥", title:"Users",     blurb:"Manage profiles, roles, and timelines." },
+  { key:"Product",   icon:"🧩", title:"Product",   blurb:"Boards, tasks, sprints, and automation." },
+];
+
+/* ---------- Component ---------- */
+export default function ProjectViewNew() {
+  const heroRef = useRef(null);
+  const barRef = useRef(null);
+  const trackRef = useRef(null);
+  const cardRefs = useRef([]);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [heroIndex, setHeroIndex] = useState(0);
+  const [hoverHero, setHoverHero] = useState(false);
+  const [lightbox, setLightbox] = useState({ open: false, i: 0 });
+  const [cat, setCat] = useState("All");
+  const [query, setQuery] = useState("");
+  const [sortBy, setSortBy] = useState("title-asc");
+  const [compact, setCompact] = useState(false);
+  const [viewport, setViewport] = useState("auto");
+  const [vw, setVw] = useState(typeof window !== 'undefined' ? window.innerWidth : 1280);
+  
+  useEffect(() => {
+    const onResize = () => setVw(window.innerWidth);
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+
+  const effectiveMode = useMemo(() => {
+    if (viewport === 'desktop') return 'desktop';
+    if (viewport === 'mobile') return 'mobile';
+    return vw <= 640 ? 'mobile' : 'desktop';
+  }, [viewport, vw]);
+
+  /* Filters + search + sort */
+  const catFiltered = useMemo(() => 
+    (cat === "All" ? GALLERY_IMGS : GALLERY_IMGS.filter(i => i.cat === cat)), 
+    [cat]);
+
+  const textFiltered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return catFiltered;
+    return catFiltered.filter(i => 
+      (i.title + " " + i.desc + " " + i.cat).toLowerCase().includes(q));
+  }, [query, catFiltered]);
+
+  const finalList = useMemo(() => {
+    const list = [...textFiltered];
+    if (sortBy === "title-asc") list.sort((a, b) => a.title.localeCompare(b.title));
+    if (sortBy === "title-desc") list.sort((a, b) => b.title.localeCompare(a.title));
+    return list;
+  }, [textFiltered, sortBy]);
+
+  const featured = FEATURED_IMGS;
+  const countLabel = `${finalList.length} item${finalList.length === 1 ? "" : "s"}`;
+
+  /* Hero autoplay + progress */
+  useEffect(() => {
+    const slides = heroRef.current?.querySelectorAll?.(".slide");
+    if (!slides || !slides.length) return;
+
+    slides.forEach((s, i) => (s.style.opacity = i === heroIndex ? "1" : "0"));
+    if (barRef.current) barRef.current.style.width = "0";
+
+    const start = Date.now();
+    const DURATION = 3300;
+
+    let raf;
+    const tick = () => {
+      const elapsed = hoverHero ? 0 : Date.now() - start;
+      const pct = Math.min(1, elapsed / DURATION);
+      if (barRef.current) barRef.current.style.width = `${pct * 100}%`;
+      if (pct >= 1) {
+        const next = (heroIndex + 1) % HERO_IMGS.length;
+        setHeroIndex(next);
+      } else {
+        raf = requestAnimationFrame(tick);
+      }
+    };
+    raf = requestAnimationFrame(tick);
+
+    return () => cancelAnimationFrame(raf);
+  }, [heroIndex, hoverHero]);
+
+  /* Lightbox keyboard */
+  useEffect(() => {
+    const onKey = (e) => {
+      if (!lightbox.open) return;
+      if (e.key === "Escape") setLightbox({ open: false, i: 0 });
+      if (e.key === "ArrowRight") setLightbox(s => ({ open: true, i: (s.i + 1) % ALL_IMGS.length }));
+      if (e.key === "ArrowLeft") setLightbox(s => ({ open: true, i: (s.i - 1 + ALL_IMGS.length) % ALL_IMGS.length }));
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [lightbox.open]);
+
+  /* Touch swipe on hero for mobile */
+  const touchRefState = useRef({ x: 0, t: 0 });
+  const onTouchStart = (e) => { const t = e.touches[0]; touchRefState.current = { x: t.clientX, t: Date.now() }; };
+  const onTouchEnd = (e) => {
+    const dx = (e.changedTouches[0]?.clientX || 0) - touchRefState.current.x;
+    const dt = Date.now() - touchRefState.current.t;
+    if (dt < 450 && Math.abs(dx) > 40) {
+      if (dx < 0) setHeroIndex((i) => (i + 1) % HERO_IMGS.length);
+      else setHeroIndex((i) => (i - 1 + HERO_IMGS.length) % HERO_IMGS.length);
+    }
+  };
+
+  const setHero = (i) => setHeroIndex(i);
+  const openLB = (i) => setLightbox({ open: true, i });
+  const closeLB = () => setLightbox({ open: false, i: 0 });
+  const nextLB = () => setLightbox(s => ({ open: true, i: (s.i + 1) % ALL_IMGS.length }));
+  const prevLB = () => setLightbox(s => ({ open: true, i: (s.i - 1 + ALL_IMGS.length) % ALL_IMGS.length }));
+
+  const go = (id) => (e) => { e?.preventDefault?.(); document.querySelector(id)?.scrollIntoView({ behavior:'smooth', block:'start' }); };
+
+  /* Intro reveal (IntersectionObserver) */
+  const introRef = useRef(null);
+  const toolbarRef = useRef(null);
+  const [introIn, setIntroIn] = useState(false);
+  const [toolbarIn, setToolbarIn] = useState(false);
+  useEffect(()=>{
+    const opts = { threshold: 0.3 };
+    const introObs = new IntersectionObserver(([e])=> setIntroIn(!!e.isIntersecting), opts);
+    const tbObs = new IntersectionObserver(([e])=> setToolbarIn(!!e.isIntersecting), opts);
+    if (introRef.current) introObs.observe(introRef.current);
+    if (toolbarRef.current) tbObs.observe(toolbarRef.current);
+    return ()=>{ introObs.disconnect(); tbObs.disconnect(); };
+  },[]);
+
+  // Combine all images for lightbox
+  const ALL_IMGS = [...FEATURED_IMGS, ...GALLERY_IMGS, ...HERO_IMGS];
+
+  const getGridClass = (idx) => {
+    if (idx % 8 === 0) return "span-8 h-320";
+    if (idx % 8 === 1) return "span-4 h-320";
+    if (idx % 8 < 4) return "span-6 h-260";
+    if (idx % 8 < 7) return "span-4 h-200";
+    return "span-12 h-320";
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0d0b33] to-[#0b0e2e] text-white flex items-center px-10 md:px-20">
-      <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+    <div className="wrap">
+      <style dangerouslySetInnerHTML={{ __html: styles }} />
+      <div className={`panel ${effectiveMode === 'mobile' ? 'mobile' : 'desktop'}`}>
         
-        <div className="z-10">
-          <p className="text-sm text-purple-300 font-medium">
-            The <span className="text-purple-500">future</span> of learning
-          </p>
-          <h1 className="text-4xl md:text-5xl font-bold leading-tight mt-4">
-            Advanced Learning Management<br />
-            <span className="text-purple-200">For Modern Education</span>
-          </h1>
-          <p className="text-gray-400 mt-4">
-  • Comprehensive courses with interactive content, progress tracking, and certification.<br />
-  {/* • Seamless user experience across devices with intuitive dashboards for learners and instructors.<br /> */}
-  • Real-time analytics and reporting tools to monitor learner performance and engagement.
-</p>
-
-
-          {/* <div className="mt-8 space-y-3">
-            <button
-              onClick={handleExploreCourses}
-              className="flex items-center gap-3 px-4 py-3 border border-[#1d2033] rounded-md w-fit bg-[#101223] hover:bg-gradient-to-br from-purple-800/20 to-transparent transition duration-300"
-            >
-              <FaRegSquare />
-              <span className="font-medium">Explore Courses</span>
-            </button>
-            <button 
-              onClick={() => window.open("https://sklassics-lms.com/", "_blank")}
-              className="flex items-center gap-3 px-4 py-3 border border-[#1d2033] rounded-md w-fit bg-[#101223] hover:bg-gradient-to-br from-purple-800/20 to-transparent transition duration-300"
-            >
-              <span>Platform Features</span>
-            </button>
-            <button 
-              onClick={() => window.open("https://sklassics-lms.com/", "_blank")}
-              className="flex items-center gap-3 px-4 py-3 border border-[#1d2033] rounded-md w-fit bg-[#101223] hover:bg-gradient-to-br from-purple-800/20 to-transparent transition duration-300"
-            >
-              <span>Contact Support</span>
-            </button>
-          </div> */}
-        </div>
-
-        <div className="relative flex justify-center items-center">
-          <div className="absolute w-[500px] h-[500px] rounded-full bg-purple-800 blur-3xl opacity-40"></div>
-          <img
-          src="https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.freepik.com%2Fpsd%2Flearning-management-system&psig=AOvVaw1GJxYyezkw8_EtRO-RT-m5&ust=1755257285633000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCKip7Y-Zio8DFQAAAAAdAAAAABAL"
-            // src={lmsHero}
-            // src="https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.employeeconnect.com%2Fsite-dis202408%2Fbenefits-of-an-learning-management-system%2F&psig=AOvVaw1GJxYyezkw8_EtRO-RT-m5&ust=1755257285633000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCKip7Y-Zio8DFQAAAAAdAAAAABAE"
-            alt="LMS Platform"
-            className="relative w-104 h-104 object-contain z-10"
-          />
-        </div>
-      </div>
-    </div>
-  );
-};
-
-const Faster = () => {
-  return (
-    <section className="bg-[#0a1026] py-16 px-2 sm:px-6">
-      <div className="max-w-6xl mx-auto">
-        <h2 className="text-3xl sm:text-5xl font-extrabold text-white text-center mb-4">
-          Smarter. Interactive Learning.
-        </h2>
-        <p className="text-zinc-400 text-center max-w-2xl mx-auto mb-12 text-base sm:text-lg">
-  Our platform delivers engaging content with progress tracking and certification. It empowers learners with personalized learning paths and real-time performance insights.
-</p>
-
-
-        <div className="bg-[#11182b] border border-zinc-700 rounded-2xl shadow-xl flex flex-col md:flex-row items-center md:items-stretch overflow-hidden"
-             style={{ minHeight: 400 }}>
-          <div className="flex-1 flex flex-col justify-center p-8 sm:p-12">
-            <h3 className="text-xl sm:text-2xl font-semibold text-white mb-3">
-              <span className="font-bold">Optimized for online learning</span>
-            </h3>
-            <p className="text-zinc-400 mb-8 text-base sm:text-lg">
-              Our system provides the most effective learning experience with interactive content.
-            </p>
-            <a
-              href="https://sklassics-lms.com/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-zinc-600 text-white font-medium hover:bg-purple-700/20 transition text-sm w-auto"
-            >
-              Visit SKlassic LMS <span className="text-purple-400">&rarr;</span>
-            </a>
-          </div>
-          <div className="flex-1 flex items-center justify-center relative min-h-[250px] bg-transparent">
-            <img
-              src="https://images.unsplash.com/photo-1588072432836-e10032774350?auto=format&fit=crop&w=1600&q=80"
-              alt="LMS Visualization"
-              className="w-full max-w-[420px] h-auto object-contain mx-auto"
-              style={{ filter: "drop-shadow(0 0 60px #a78bfa66)" }}
-            />
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-};
-
-const WhyTrustUs = () => {
-  const features = [
-    {
-      category: 'Learning Features',
-      items: [
-        { icon: <LucideMessageCircle size={20} />, title: 'Interactive Content' },
-        { icon: <LucideLayoutDashboard size={20} />, title: 'Progress Dashboard' },
-        { icon: <LucideSearch size={20} />, title: 'Searchable Resources' },
-      ],
-    },
-    {
-      category: 'User Experience',
-      items: [
-        { icon: <LucideBarChart2 size={20} />, title: 'Performance Analytics' },
-        { icon: <LucideBell size={20} />, title: 'Course Notifications' },
-        { icon: <LucideLink size={20} />, title: 'Resource Sharing' },
-      ],
-    },
-    {
-      category: 'Quality Standards',
-      items: [
-        { icon: <LucideShield size={20} />, title: 'Certified Courses' },
-        { icon: <LucideDownload size={20} />, title: 'Downloadable Materials' },
-        { icon: <LucideClock size={20} />, title: 'Self-Paced Learning' },
-      ],
-    },
-  ];
-
-  return (
-    <section className="bg-[#0E1321] text-white py-16 px-6 md:px-16">
-      <div className="max-w-7xl mx-auto">
-        <h2 className="text-4xl font-extrabold text-white mb-4">
-          <span className="bg-gradient-to-r from-purple-400 to-white bg-clip-text text-transparent">
-            Why choose SKlassic LMS?
-          </span>
-        </h2>
-        <p className="text-gray-300 text-lg mb-12 max-w-3xl">
-          We're redefining online education with comprehensive courses, interactive content, and cutting-edge learning tools.
-        </p>
-
-        {features.map((group, i) => (
-          <div key={i} className="mb-10">
-            <h3 className="text-sm text-purple-400 font-semibold mb-6">{group.category}</h3>
-            <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-3">
-              {group.items.map((item, j) => (
-                <div key={j} className="flex items-start space-x-4">
-                  <div className="text-purple-300 mt-1">{item.icon}</div>
-                  <div>
-                    <h4 className="text-white font-semibold text-lg mb-1">{item.title}</h4>
-                    <p className="text-gray-400 text-sm">
-                      Our platform ensures the highest standards for your learning experience.
-                    </p>
-                  </div>
-                </div>
-              ))}
+        {/* Topbar */}
+        <div className="topbar" role="navigation" aria-label="Primary">
+          <div className="tb-inner">
+            <div className="brand">
+              <div className="logo" aria-hidden="true" />
+              <h1>Showcase Home</h1>
+            </div>
+            {/* Desktop/Tablet Nav */}
+            <div className="navlinks desktop-nav">
+              <button className="alink" onClick={go('#about')}>About</button>
+              <button className="alink" onClick={go('#carousel')}>Carousel</button>
+              <button className="alink" onClick={go('#sections')}>Sections</button>
+              <button className="alink" onClick={go('#hero')}>Hero</button>
+              <button className="alink" onClick={go('#featured')}>Featured</button>
+              <button className="alink" onClick={go('#gallery')}>Gallery</button>
+            </div>
+            {/* Mobile Nav */}
+            <div className="mobile-nav">
+              <button className="hamburger" onClick={()=>setMenuOpen(true)} aria-label="Open menu">☰</button>
             </div>
           </div>
-        ))}
-      </div>
-    </section>
-  );
-};
-
-const FeatureCarousel = () => {
-    const scrollRef = useRef(null);
-    const cards = [
-      {
-        title: "Comprehensive Courses",
-        desc: "Wide range of subjects with professionally developed content.",
-        icon: "📚",
-      },
-      {
-        title: "Interactive Learning",
-        desc: "Engaging multimedia content with quizzes and exercises.",
-        icon: "🖥️",
-      },
-      {
-        title: "Progress Tracking",
-        desc: "Monitor your learning journey with detailed analytics.",
-        icon: "📊",
-      },
-      {
-        title: "Certification",
-        desc: "Earn recognized certificates upon course completion.",
-        icon: "🏆",
-      },
-      {
-        title: "Mobile Friendly",
-        desc: "Learn anytime, anywhere with our responsive platform.",
-        icon: "📱",
-      },
-    ];
-  
-    const scroll = (direction) => {
-      const scrollAmount = 350;
-      if (scrollRef.current) {
-        scrollRef.current.scrollBy({
-          left: direction === "left" ? -scrollAmount : scrollAmount,
-          behavior: "smooth",
-        });
-      }
-    };
-  
-    return (
-      <div className="bg-[#0a0c1b] text-white py-16 px-4">
-        <div className="text-center max-w-3xl mx-auto mb-12">
-          <p className="text-sm text-purple-400 font-medium">SKlassic LMS Features</p>
-          <h2 className="text-4xl font-bold mt-2 mb-4">Your learning platform</h2>
-          <p className="text-gray-400">
-            Experience the future of education with our comprehensive learning management system.
-          </p>
+          {/* Mobile Drawer Menu */}
+          <div className={`mobile-menu${menuOpen ? " open" : ""}`}>
+            {/* Pills menu as vertical */}
+            <div className="mobile-pill-vertical">
+              <button className="pill-link" onClick={go('#about')}>About</button>
+              <button className="pill-link" onClick={go('#carousel')}>Carousel</button>
+              <button className="pill-link" onClick={go('#sections')}>Sections</button>
+              <button className="pill-link" onClick={go('#hero')}>Hero</button>
+              <button className="pill-link" onClick={go('#featured')}>Featured</button>
+              <button className="pill-link" onClick={go('#gallery')}>Gallery</button>
+            </div>
+          </div>
+          {menuOpen && <div className="drawer-overlay" onClick={()=>setMenuOpen(false)} />}
         </div>
-  
-        <div className="relative">
-          <div
-            ref={scrollRef}
-            className="flex overflow-x-auto no-scrollbar scroll-smooth space-x-6 px-2"
-          >
-            {cards.map((card, index) => (
-              <div
-                key={index}
-                className="min-w-[280px] md:min-w-[300px] bg-[#101223] rounded-xl border border-[#1d2033] p-6 hover:bg-gradient-to-br from-purple-800/20 to-transparent transition duration-300"
-              >
-                <div className="text-2xl mb-4">{card.icon}</div>
-                <h3 className="text-xl font-semibold mb-2">{card.title}</h3>
-                <p className="text-gray-400 mb-4">{card.desc}</p>
+
+        {/* Header / lead */}
+        <div className="header header-grid" id="about">
+          <div className={`intro ${introIn ? 'in' : ''}`} ref={introRef}>
+            <h2 className="title">
+              <span className="ink">Welcome to your project home</span>
+            </h2>
+            <p className="lead lead-rail">
+              A single-screen hub that blends a <span className="hl">cinematic hero</span>, <span className="hl">rich descriptions</span>,
+              <span className="hl"> quick actions</span>, and <span className="hl">categorized sections</span>. Use the chips to filter,
+              the search to find anything fast, and the lightbox to view details. Toggle the <strong>viewport</strong> to preview
+              desktop/mobile instantly.
+            </p>
+          </div>
+        </div>
+        <hr className="divider" />
+
+        {/* Quick status */}
+        <div className="section">
+          <div className="section-h"><h3>Overview</h3><span className="hint">System health & activity</span></div>
+          <div className="stats" role="list">
+            <div className="stat" role="listitem"><h4>Uptime</h4><p className="ok">99.98%</p></div>
+            <div className="stat" role="listitem"><h4>Active Users</h4><p>1,248</p></div>
+            <div className="stat" role="listitem"><h4>Open Tasks</h4><p className="warn">37</p></div>
+            <div className="stat" role="listitem"><h4>Incidents</h4><p className="bad">2</p></div>
+          </div>
+        </div>
+
+        {/* Sections directory */}
+        <div className="section" id="sections">
+          <div className="section-h"><h3>Sections</h3><span className="hint">Jump into a focused space</span></div>
+          <div className="sections">
+            {SECTIONS.map((s)=> (
+              <div key={s.key} className="section-card">
+                <h4>{s.icon} {s.title}</h4>
+                <p>{s.blurb}</p>
+                <div className="act">
+                  <button className="btn" onClick={()=>{ setCat(s.key); document.querySelector('#gallery')?.scrollIntoView({behavior:'smooth'}); }}>
+                    View {s.title}
+                  </button>
+                </div>
               </div>
             ))}
           </div>
-  
-          <div className="flex justify-center gap-6 mt-6">
-            <button
-              onClick={() => scroll("left")}
-              className="bg-[#1d2033] hover:bg-[#292d45] p-2 rounded-full text-white"
-            >
-              <FaArrowLeft />
-            </button>
-            <button
-              onClick={() => scroll("right")}
-              className="bg-[#1d2033] hover:bg-[#292d45] p-2 rounded-full text-white"
-            >
-              <FaArrowRight />
-            </button>
+        </div>
+
+        {/* Hero slider */}
+        <div className="section" id="hero">
+          <div className="section-h"><h3>Spotlight</h3><span className="hint">Swipe or click to explore</span></div>
+          <div className="hero" onMouseEnter={() => setHoverHero(true)} onMouseLeave={() => setHoverHero(false)}>
+            <div className="hero-inner" ref={heroRef} onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
+              {HERO_IMGS.map((img, i) => (
+                <div className={`slide ${i === heroIndex ? "active" : ""}`} key={img.src} onClick={() => openLB([...FEATURED_IMGS, ...GALLERY_IMGS, ...HERO_IMGS].findIndex(x => x.src === img.src))}>
+                  <img src={img.src} alt={img.title} loading="eager" />
+                </div>
+              ))}
+              <div className="fade-shadow" />
+              <div className="hero-cta">
+                <button className="pill filled" onClick={()=>{ setCat('All'); document.querySelector('#featured')?.scrollIntoView({behavior:'smooth'}); }}>Explore Featured</button>
+                <button className="pill" onClick={()=>{ setCat('Analytics'); document.querySelector('#gallery')?.scrollIntoView({behavior:'smooth'}); }}>See Analytics</button>
+              </div>
+              <div className="hero-info">
+                <p className="hero-title">{HERO_IMGS[heroIndex].title}</p>
+                <p className="hero-desc">{HERO_IMGS[heroIndex].desc}</p>
+              </div>
+              <div className="nav">
+                <button onClick={() => setHero((heroIndex - 1 + HERO_IMGS.length) % HERO_IMGS.length)} aria-label="Prev">◀</button>
+                <button onClick={() => setHero((heroIndex + 1) % HERO_IMGS.length)} aria-label="Next">▶</button>
+              </div>
+              <div className="progress"><div className="bar" ref={barRef} /></div>
+            </div>
+            <div className="thumbs">
+              {HERO_IMGS.map((img, i) => (
+                <button key={img.src} data-t={img.title} className={`thumb ${i === heroIndex ? "active" : ""}`} onClick={() => setHero(i)}>
+                  <img src={img.src} alt={`${img.title} thumbnail`} loading="lazy" />
+                </button>
+              ))}
+            </div>
           </div>
         </div>
-      </div>
-    );
-  };
 
-const LMSDisplay = () => {
-  return (
-    <div className="bg-[#0a0a23] text-white">
-      <FullScreenCarousel />
-      <AuthHero />
-      <Faster />
-      <WhyTrustUs />
-      <FeatureCarousel />
-      <Footer />
+        {/* Filters */}
+        <div className="section">
+          <div className="section-h"><h3>Filters</h3><span className="hint">Refine by category</span></div>
+          <div className="filters" role="tablist" aria-label="Categories">
+            {CATS.map(c => (
+              <button
+                key={c}
+                role="tab"
+                aria-selected={c === cat}
+                className={`chip ${c === cat ? "active" : ""}`}
+                onClick={() => setCat(c)}
+              >
+                {CAT_ICONS[c] || "•"} {c}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Featured slice */}
+        <div className="section" id="featured">
+          <div className="section-h"><h3>Featured</h3><span className="hint">Hand-picked highlights</span></div>
+          <div className={`grid ${compact ? "compact" : ""}`}>
+            {featured.map((img, idx) => (
+              <div
+                key={img.src}
+                className={`${idx % 2 === 0 ? "span-8 h-320" : "span-4 h-320"} card`}
+                onClick={() => setLightbox({ open: true, i: [...FEATURED_IMGS, ...GALLERY_IMGS, ...HERO_IMGS].findIndex(x => x.src === img.src) })}
+                title={`${img.title} — ${img.desc}`}
+              >
+                <span className="tag">{img.cat}</span>
+                <img src={img.src} alt={img.title} loading="lazy" />
+                <div className="cap">
+                  <p className="t">{img.title}</p>
+                  <p className="d">{img.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Gallery section */}
+        <div className="section" id="gallery">
+          <div className="section-h">
+            <h3>Gallery</h3>
+            <span className="hint">All items • {countLabel}</span>
+          </div>
+          <div className={`grid ${compact ? "compact" : ""}`}>
+            {finalList.map((img, idx) => (
+              <div
+                key={img.src}
+                className={`card ${getGridClass(idx)}`}
+                onClick={() =>
+                  setLightbox({ open: true, i: [...FEATURED_IMGS, ...GALLERY_IMGS, ...HERO_IMGS].findIndex(x => x.src === img.src) })
+                }
+                title={`${img.title} — ${img.desc}`}
+              >
+                <span className="tag">{img.cat}</span>
+                <img src={img.src} alt={img.title} loading="lazy" />
+                <div className="cap">
+                  <p className="t">{img.title}</p>
+                  <p className="d">{img.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Lightbox */}
+        {lightbox.open && (
+          <div className="lightbox" onClick={closeLB}>
+            <div className="lb-inner" onClick={(e) => e.stopPropagation()}>
+              <div className="lb-head">
+                <h3 className="lb-title">{ALL_IMGS[lightbox.i].title}</h3>
+                <button className="lb-close" onClick={closeLB}>Close</button>
+              </div>
+              <div className="lb-media">
+                <img 
+                  src={ALL_IMGS[lightbox.i].src} 
+                  alt={ALL_IMGS[lightbox.i].title} 
+                />
+                <div className="lb-nav">
+                  <button className="lb-btn" onClick={prevLB}>◀</button>
+                  <button className="lb-btn" onClick={nextLB}>▶</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
-};
-
-export default LMSDisplay;
-
-
-// import React, { useState, useRef, useEffect } from "react";
-// import lmsHero from "../../assets/lms.png"; 
-// import { motion, AnimatePresence } from "framer-motion";
-// import { FaArrowLeft, FaArrowRight, FaRegSquare } from "react-icons/fa";
-// import { 
-//   LucideMessageCircle, 
-//   LucideBarChart2, 
-//   LucideBell, 
-//   LucideShield, 
-//   LucideDownload, 
-//   LucideClock, 
-//   LucideLayoutDashboard, 
-//   LucideLink,
-//   LucideSearch
-// } from 'lucide-react';
-// import Footer from "../../animated-portfolio/Footer";
-
-// const projectImages = [
-//   {
-//     src: "https://images.unsplash.com/photo-1563986768609-322da13575f3?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&h=900",
-//     title: "Your 24/7 Tutor (Who Never Judges)",
-//     alt: "Macbook with VS Code and terminal windows"
-//   }, 
-//   {
-//     src: "https://images.unsplash.com/photo-1573164713988-8665fc963095?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&h=900",
-//     title: "Turn 'I Think I Know' Into 'I'm Certified!'",
-//     alt: "CI/CD workflow visualization on dark screen"
-//   },
-//   {
-//     src: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&h=900",
-//     title: "Skip the Lecture, Keep the Knowledge",
-//     alt: "Group of developers working together on laptops"
-//   }
-// ];
-
-// const RadialMenu = () => {
-//   const [isOpen, setIsOpen] = useState(false);
-//   const [hoveredItem, setHoveredItem] = useState(null);
-//   const [windowSize, setWindowSize] = useState({
-//     width: window.innerWidth,
-//     height: window.innerHeight
-//   });
-
-//   useEffect(() => {
-//     const handleResize = () => {
-//       setWindowSize({
-//         width: window.innerWidth,
-//         height: window.innerHeight
-//       });
-//     };
-
-//     window.addEventListener('resize', handleResize);
-//     return () => window.removeEventListener('resize', handleResize);
-//   }, []);
-
-//   const handleClick = (href, e) => {
-//     e.preventDefault();
-//     setIsOpen(false);
-
-//     setTimeout(() => {
-//       const id = href.replace("#", "");
-//       const el = document.getElementById(id);
-//       if (el) {
-//         const yOffset = -40;
-//         const y = el.getBoundingClientRect().top + window.pageYOffset + yOffset;
-//         window.scrollTo({ top: y, behavior: "smooth" });
-//       }
-//     }, 400);
-//   };
-
-//   const menuItems = [
-//     { label: "Profile", angle: 0, href: "#profile", icon: "👤" },
-//     { label: "Work", angle: 90, href: "#work", icon: "💼" },
-//     { label: "Projects", angle: 180, href: "#projects", icon: "🚀" },
-//     { label: "About", angle: 270, href: "#about", icon: "ℹ️" },
-//   ];
-
-//   // Dynamic radius based on screen size
-//   const radius = windowSize.width < 768 ? 70 : 100;
-//   const menuSize = windowSize.width < 768 ? 40 : 50;
-//   const menuContainerSize = windowSize.width < 768 ? 180 : 220;
-
-//   return (
-//     <div className="fixed top-4 right-4 z-[100] text-white">
-//       <motion.div
-//         className="relative w-[50px] h-[50px] md:w-[60px] md:h-[60px] rounded-full border border-primary-800 flex items-center justify-center"
-//         animate={{ rotate: [0, 360] }}
-//         transition={{ repeat: Infinity, duration: 30, ease: "linear" }}
-//       >
-//         <motion.button
-//           onClick={() => setIsOpen(!isOpen)}
-//           className={`w-[${menuSize}px] h-[${menuSize}px] rounded-full bg-gradient-to-br from-purple-900/80 via-indigo-900/80 to-blue-900/80 border border-purple-500 text-xs font-bold backdrop-blur-sm flex items-center justify-center text-white interactive-glow`}
-//           whileHover={{ 
-//             scale: 1.05, 
-//             boxShadow: "0 0 15px rgba(168, 85, 247, 0.5)",
-//           }}
-//           whileTap={{ scale: 0.98 }}
-//           animate={{ 
-//             boxShadow: ["0 0 0px rgba(168, 85, 247, 0.3)", "0 0 10px rgba(168, 85, 247, 0.5)", "0 0 0px rgba(168, 85, 247, 0.3)"],
-//           }}
-//           transition={{ duration: 2, repeat: Infinity }}
-//           style={{ width: menuSize, height: menuSize }}
-//         >
-//           <span className="animate-text-shimmer text-[10px] md:text-xs">{isOpen ? "CLOSE" : "MENU"}</span>
-//         </motion.button>
-//       </motion.div>
-
-//       <AnimatePresence>
-//         {isOpen && (
-//           <>
-//             <motion.div
-//               className="fixed inset-0 bg-dark-950/90 backdrop-blur-md z-[40]"
-//               initial={{ opacity: 0 }}
-//               animate={{ opacity: 1 }}
-//               exit={{ opacity: 0 }}
-//               transition={{ duration: 0.4 }}
-//               onClick={() => setIsOpen(false)}
-//             />
-
-//             <motion.div
-//               className="fixed top-8 right-8 rounded-full border border-primary-500 z-[50] shadow-glow-purple-lg"
-//               initial={{ opacity: 0, scale: 0 }}
-//               animate={{ opacity: 1, scale: 1 }}
-//               exit={{ opacity: 0, scale: 0 }}
-//               transition={{ duration: 0.5 }}
-//               style={{ width: menuContainerSize, height: menuContainerSize }}
-//             >
-//               <div className="absolute inset-0 bg-[conic-gradient(from_0deg,_#a855f7_0deg,_#a855f7_10deg,_transparent_10deg,_transparent_72deg,_#a855f7_72deg,_#a855f7_82deg,_transparent_82deg)] opacity-40 rounded-full animate-spin-slow pointer-events-none" />
-              
-//               {menuItems.map((item) => {
-//                 const angleRad = (item.angle * Math.PI) / 180;
-//                 const x = radius * Math.cos(angleRad);
-//                 const y = radius * Math.sin(angleRad);
-
-//                 return (
-//                   <div
-//                     key={item.label}
-//                     className="absolute z-[60]"
-//                     style={{
-//                       left: `calc(50% + ${x}px - ${menuSize/2}px)`,
-//                       top: `calc(50% - ${y}px - ${menuSize/2}px)`,
-//                     }}
-//                   >
-//                     <motion.div 
-//                       className={`relative rounded-full border border-[#6b21a8]/60 flex items-center justify-center`}
-//                       onHoverStart={() => setHoveredItem(item.label)}
-//                       onHoverEnd={() => setHoveredItem(null)}
-//                       style={{ width: menuSize + 10, height: menuSize + 10 }}
-//                     >
-//                       <motion.a
-//                         href={item.href}
-//                         className={`rounded-full bg-gradient-to-br from-purple-900/80 via-indigo-900/80 to-blue-900/80 border border-purple-500 text-white font-bold backdrop-blur-sm flex flex-col items-center justify-center cursor-pointer z-[70] interactive-glow`}
-//                         whileHover={{ 
-//                           scale: 1.1, 
-//                           boxShadow: "0 0 15px rgba(168, 85, 247, 0.5)",
-//                         }}
-//                         whileTap={{ scale: 0.98 }}
-//                         animate={{ 
-//                           boxShadow: hoveredItem === item.label 
-//                             ? "0 0 20px rgba(168, 85, 247, 0.8)"
-//                             : ["0 0 0px rgba(168, 85, 247, 0.3)", "0 0 10px rgba(168, 85, 247, 0.5)", "0 0 0px rgba(168, 85, 247, 0.3)"],
-//                         }}
-//                         transition={{ duration: 2, repeat: Infinity }}
-//                         onClick={(e) => handleClick(item.href, e)}
-//                         tabIndex={isOpen ? 0 : -1}
-//                         aria-label={item.label}
-//                         style={{ width: menuSize, height: menuSize }}
-//                       >
-//                         <span className="text-lg mb-1">{item.icon}</span>
-//                         <span className="animate-text-shimmer text-[10px] md:text-xs">{item.label}</span>
-//                       </motion.a>
-//                     </motion.div>
-//                   </div>
-//                 );
-//               })}
-//             </motion.div>
-//           </>
-//         )}
-//       </AnimatePresence>
-//     </div>
-//   );
-// };
-
-// function FullScreenCarousel() {
-//   const [current, setCurrent] = React.useState(0);
-
-//   React.useEffect(() => {
-//     const interval = setInterval(() => {
-//       setCurrent((c) => (c === projectImages.length - 1 ? 0 : c + 1));
-//     }, 4000);
-//     return () => clearInterval(interval);
-//   }, []);
-
-//   return (
-//     <section className="relative w-full h-screen flex items-center justify-center bg-[#1a1333] overflow-hidden">
-//       <div className="absolute inset-0 z-0">
-//         <div className="w-full h-full bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-20" />
-//       </div>
-      
-//       <RadialMenu />
-
-//       <img
-//         src={projectImages[current].src}
-//         alt={projectImages[current].alt}
-//         className="absolute inset-0 w-full h-full object-cover object-center transition-all duration-500 z-0"
-//         style={{ filter: "brightness(0.7)" }}
-//       />
-//       <div className="relative z-10 flex pt-60 flex-col items-center justify-center w-full h-full px-4">
-//         <h3 className="text-2xl md:text-4xl lg:text-5xl font-bold text-white drop-shadow mb-6 px-4 py-2 md:px-8 md:py-4 rounded-2xl text-center">
-//           {projectImages[current].title}
-//         </h3>
-//         <div className="flex justify-center gap-3 mt-8">
-//           {projectImages.map((_, idx) => (
-//             <button
-//               key={idx}
-//               onClick={() => setCurrent(idx)}
-//               className={`w-3 h-3 md:w-4 md:h-4 rounded-full border-2 border-purple-400 ${
-//                 idx === current ? "bg-purple-400" : "bg-purple-900"
-//               }`}
-//               aria-label={`Go to slide ${idx + 1}`}
-//             />
-//           ))}
-//         </div>
-//       </div>
-//       <div className="absolute inset-0 bg-gradient-to-t from-[#1a1333] via-transparent to-[#1a1333]/60 pointer-events-none" />
-//     </section>
-//   );
-// }
-
-// const AuthHero = () => {
-//   const handleExploreCourses = () => {
-//     window.location.href = "https://sklassics-lms.com/";
-//   };
-
-//   return (
-//     <div className="min-h-screen bg-gradient-to-br from-[#0d0b33] to-[#0b0e2e] text-white flex items-center px-4 md:px-20 py-20">
-//       <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-        
-//         <div className="z-10 order-2 md:order-1">
-//           <p className="text-sm text-purple-300 font-medium">
-//             The <span className="text-purple-500">future</span> of learning
-//           </p>
-//           <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight mt-4">
-//             Advanced Learning Management<br />
-//             <span className="text-purple-200">For Modern Education</span>
-//           </h1>
-//           <p className="text-gray-400 mt-4 text-sm md:text-base">
-//             • Comprehensive courses with interactive content, progress tracking, and certification.<br />
-//             • Real-time analytics and reporting tools to monitor learner performance and engagement.
-//           </p>
-
-//           <div className="mt-8">
-//             <button
-//               onClick={handleExploreCourses}
-//               className="flex items-center gap-3 px-4 py-3 border border-[#1d2033] rounded-md w-full md:w-fit bg-[#101223] hover:bg-gradient-to-br from-purple-800/20 to-transparent transition duration-300 text-sm md:text-base"
-//             >
-//               <FaRegSquare />
-//               <span className="font-medium">Explore Courses</span>
-//             </button>
-//           </div>
-//         </div>
-
-//         <div className="relative flex justify-center items-center order-1 md:order-2">
-//           <div className="absolute w-[300px] h-[300px] md:w-[500px] md:h-[500px] rounded-full bg-purple-800 blur-3xl opacity-40"></div>
-//           <img
-//             src={lmsHero}
-//             alt="LMS Platform"
-//             className="relative w-full max-w-md h-auto object-contain z-10"
-//           />
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// const Faster = () => {
-//   return (
-//     <section className="bg-[#0a1026] py-16 px-4 sm:px-6">
-//       <div className="max-w-6xl mx-auto">
-//         <h2 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-white text-center mb-4">
-//           Smarter. Interactive Learning.
-//         </h2>
-//         <p className="text-zinc-400 text-center max-w-2xl mx-auto mb-12 text-sm sm:text-base">
-//           Our platform delivers engaging content with progress tracking and certification. It empowers learners with personalized learning paths and real-time performance insights.
-//         </p>
-
-//         <div className="bg-[#11182b] border border-zinc-700 rounded-2xl shadow-xl flex flex-col md:flex-row items-center md:items-stretch overflow-hidden"
-//              style={{ minHeight: 'auto' }}>
-//           <div className="flex-1 flex flex-col justify-center p-6 sm:p-8 md:p-12">
-//             <h3 className="text-xl sm:text-2xl font-semibold text-white mb-3">
-//               <span className="font-bold">Optimized for online learning</span>
-//             </h3>
-//             <p className="text-zinc-400 mb-6 sm:mb-8 text-sm sm:text-base">
-//               Our system provides the most effective learning experience with interactive content.
-//             </p>
-//             <a
-//               href="https://sklassics-lms.com/"
-//               target="_blank"
-//               rel="noopener noreferrer"
-//               className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-zinc-600 text-white font-medium hover:bg-purple-700/20 transition text-sm w-auto"
-//             >
-//               Visit SKlassic LMS <span className="text-purple-400">&rarr;</span>
-//             </a>
-//           </div>
-//           <div className="flex-1 flex items-center justify-center relative min-h-[250px] bg-transparent p-4">
-//             <img
-//               src="https://images.unsplash.com/photo-1588072432836-e10032774350?auto=format&fit=crop&w=1600&q=80"
-//               alt="LMS Visualization"
-//               className="w-full max-w-[420px] h-auto object-contain mx-auto"
-//               style={{ filter: "drop-shadow(0 0 60px #a78bfa66)" }}
-//             />
-//           </div>
-//         </div>
-//       </div>
-//     </section>
-//   );
-// };
-
-// const WhyTrustUs = () => {
-//   const features = [
-//     {
-//       category: 'Learning Features',
-//       items: [
-//         { icon: <LucideMessageCircle size={18} />, title: 'Interactive Content' },
-//         { icon: <LucideLayoutDashboard size={18} />, title: 'Progress Dashboard' },
-//         { icon: <LucideSearch size={18} />, title: 'Searchable Resources' },
-//       ],
-//     },
-//     {
-//       category: 'User Experience',
-//       items: [
-//         { icon: <LucideBarChart2 size={18} />, title: 'Performance Analytics' },
-//         { icon: <LucideBell size={18} />, title: 'Course Notifications' },
-//         { icon: <LucideLink size={18} />, title: 'Resource Sharing' },
-//       ],
-//     },
-//     {
-//       category: 'Quality Standards',
-//       items: [
-//         { icon: <LucideShield size={18} />, title: 'Certified Courses' },
-//         { icon: <LucideDownload size={18} />, title: 'Downloadable Materials' },
-//         { icon: <LucideClock size={18} />, title: 'Self-Paced Learning' },
-//       ],
-//     },
-//   ];
-
-//   return (
-//     <section className="bg-[#0E1321] text-white py-16 px-4 md:px-8 lg:px-16">
-//       <div className="max-w-7xl mx-auto">
-//         <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-4">
-//           <span className="bg-gradient-to-r from-purple-400 to-white bg-clip-text text-transparent">
-//             Why choose SKlassic LMS?
-//           </span>
-//         </h2>
-//         <p className="text-gray-300 text-base md:text-lg mb-8 md:mb-12 max-w-3xl">
-//           We're redefining online education with comprehensive courses, interactive content, and cutting-edge learning tools.
-//         </p>
-
-//         {features.map((group, i) => (
-//           <div key={i} className="mb-8 md:mb-10">
-//             <h3 className="text-xs md:text-sm text-purple-400 font-semibold mb-4 md:mb-6">{group.category}</h3>
-//             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-//               {group.items.map((item, j) => (
-//                 <div key={j} className="flex items-start space-x-3 md:space-x-4">
-//                   <div className="text-purple-300 mt-0.5">{item.icon}</div>
-//                   <div>
-//                     <h4 className="text-white font-semibold text-base md:text-lg mb-1">{item.title}</h4>
-//                     <p className="text-gray-400 text-xs md:text-sm">
-//                       Our platform ensures the highest standards for your learning experience.
-//                     </p>
-//                   </div>
-//                 </div>
-//               ))}
-//             </div>
-//           </div>
-//         ))}
-//       </div>
-//     </section>
-//   );
-// };
-
-// const FeatureCarousel = () => {
-//   const scrollRef = useRef(null);
-//   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
-
-//   useEffect(() => {
-//     const handleResize = () => {
-//       setWindowWidth(window.innerWidth);
-//     };
-
-//     window.addEventListener('resize', handleResize);
-//     return () => window.removeEventListener('resize', handleResize);
-//   }, []);
-
-//   const cards = [
-//     {
-//       title: "Comprehensive Courses",
-//       desc: "Wide range of subjects with professionally developed content.",
-//       icon: "📚",
-//     },
-//     {
-//       title: "Interactive Learning",
-//       desc: "Engaging multimedia content with quizzes and exercises.",
-//       icon: "🖥️",
-//     },
-//     {
-//       title: "Progress Tracking",
-//       desc: "Monitor your learning journey with detailed analytics.",
-//       icon: "📊",
-//     },
-//     {
-//       title: "Certification",
-//       desc: "Earn recognized certificates upon course completion.",
-//       icon: "🏆",
-//     },
-//     {
-//       title: "Mobile Friendly",
-//       desc: "Learn anytime, anywhere with our responsive platform.",
-//       icon: "📱",
-//     },
-//   ];
-
-//   const scroll = (direction) => {
-//     const scrollAmount = windowWidth < 768 ? 280 : 350;
-//     if (scrollRef.current) {
-//       scrollRef.current.scrollBy({
-//         left: direction === "left" ? -scrollAmount : scrollAmount,
-//         behavior: "smooth",
-//       });
-//     }
-//   };
-
-//   return (
-//     <div className="bg-[#0a0c1b] text-white py-16 px-4">
-//       <div className="text-center max-w-3xl mx-auto mb-8 md:mb-12 px-4">
-//         <p className="text-xs md:text-sm text-purple-400 font-medium">SKlassic LMS Features</p>
-//         <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mt-2 mb-3 md:mb-4">Your learning platform</h2>
-//         <p className="text-gray-400 text-sm md:text-base">
-//           Experience the future of education with our comprehensive learning management system.
-//         </p>
-//       </div>
-
-//       <div className="relative">
-//         <div
-//           ref={scrollRef}
-//           className="flex overflow-x-auto no-scrollbar scroll-smooth space-x-4 px-2"
-//         >
-//           {cards.map((card, index) => (
-//             <div
-//               key={index}
-//               className="min-w-[260px] md:min-w-[280px] lg:min-w-[300px] bg-[#101223] rounded-xl border border-[#1d2033] p-4 md:p-6 hover:bg-gradient-to-br from-purple-800/20 to-transparent transition duration-300 flex-shrink-0"
-//             >
-//               <div className="text-2xl mb-3 md:mb-4">{card.icon}</div>
-//               <h3 className="text-lg md:text-xl font-semibold mb-1 md:mb-2">{card.title}</h3>
-//               <p className="text-gray-400 text-xs md:text-sm mb-3 md:mb-4">{card.desc}</p>
-//             </div>
-//           ))}
-//         </div>
-
-//         <div className="flex justify-center gap-4 md:gap-6 mt-6">
-//           <button
-//             onClick={() => scroll("left")}
-//             className="bg-[#1d2033] hover:bg-[#292d45] p-2 rounded-full text-white"
-//             aria-label="Scroll left"
-//           >
-//             <FaArrowLeft size={14} />
-//           </button>
-//           <button
-//             onClick={() => scroll("right")}
-//             className="bg-[#1d2033] hover:bg-[#292d45] p-2 rounded-full text-white"
-//             aria-label="Scroll right"
-//           >
-//             <FaArrowRight size={14} />
-//           </button>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// const LMSDisplay = () => {
-//   return (
-//     <div className="bg-[#0a0a23] text-white">
-//       <FullScreenCarousel />
-//       <AuthHero />
-//       <Faster />
-//       <WhyTrustUs />
-//       <FeatureCarousel />
-//       <Footer />
-//     </div>
-//   );
-// };
-
-// export default LMSDisplay;
+}

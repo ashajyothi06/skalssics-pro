@@ -1,2085 +1,929 @@
-// import React, { useState, useRef } from "react";
-// import lmsHero from "../../assets/lms.png"; 
-// import { motion, AnimatePresence } from "framer-motion";
-// import { FaArrowLeft, FaArrowRight, FaRegSquare, FaRegUser, FaArrowsAltH } from "react-icons/fa";
-// import { 
-//   LucideSearch, 
-//   LucideUsers, 
-//   LucideBarChart2, 
-//   LucideBell, 
-//   LucideShield, 
-//   LucideDownload, 
-//   LucideClock, 
-//   LucideMessageCircle, 
-//   LucideLayoutDashboard, 
-//   LucideLink 
-// } from 'lucide-react';
-// import Footer from "../../animated-portfolio/Footer";
+// src/project_view_new.jsx — Advanced Home v3
+// Enhanced header animations & alignment + top carousel + rich descriptions (single-file, no deps)
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import image1 from '../../assets/resign1.png';
 
-// // Project Images Carousel
-// const projectImages = [
+/* ---------- Styles (inline) ---------- */
+const styles = `
+  :root {
+    --bg:#000; --panel:#0b0b0b; --text:#f6f3ff; --muted:#b7a9d9;
+    --purple:#a855f7; --purple-2:#7c3aed; --border:rgba(168,85,247,0.35);
+    --shadow:0 30px 80px rgba(0,0,0,.65);
+    --success:#22c55e; --warning:#eab308; --danger:#ef4444;
+  }
+  *{box-sizing:border-box}
+  html,body,#root{height:100%}
+  body{margin:0;background:#000;color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial}
+
+  /* Wrapper ensures full height + centered */
+.wrap {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 28px;
+}
+
+/* Panel base */
+.panel {
+  width: min(1280px, 95vw);
+  background: #0b0b0b;
+  border: 1px solid var(--border);
+  border-radius: 50px;
+  box-shadow: var(--shadow);
+  padding: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Gradient top accent */
+.panel::before {
+  content:"";
+  position:absolute;
+  left:0; right:0; top:0;
+  height:2px;
+  background:linear-gradient(90deg, var(--purple), var(--purple-2));
+  opacity:.9;
+}
+
+/* -----------------------------------
+   Device simulation wrapper classes
+----------------------------------- */
+.panel.desktop {
+  /* Desktop wide: keep original large scaling */
+  width: min(2000px, 90vw);
+}
+
+.panel.tablet {
+  /* Tablet friendly width */
+  width: min(900px, 94vw);
+  border-radius: 20px;
+}
+
+.panel.mobile {
+  /* Mobile narrow version */
+  width: min(420px, 96vw);
+  border-radius: 24px;
+}
+
+/* -----------------------------------
+   Automatic Responsive Breakpoints
+----------------------------------- */
+
+/* Tablets (≤1024px but >640px) */
+@media (max-width:1024px) {
+  .panel {
+    width: 95vw;           /* Fill most of screen width */
+    border-radius: 18px;
+  }
+  .wrap {
+    padding: 20px;
+  }
+}
+
+/* Mobiles (≤640px) */
+@media (max-width:640px) {
+  .panel {
+    width: 98vw;           /* nearly full screen */
+    border-radius: 16px;   /* smaller radius for compact look */
+  }
+  .wrap {
+    padding: 12px;
+  }
+}
+
+
+  /* Topbar */
+  .topbar{position:sticky;top:0;z-index:20;background:linear-gradient(180deg,#0b0b0b 70%, rgba(11,11,11,0));
+    border-bottom:1px solid var(--border);backdrop-filter:saturate(120%)}
+  .tb-inner{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 18px}
+  .brand{display:flex;align-items:center;gap:10px}
+  .logo{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,var(--purple),var(--purple-2));
+    box-shadow:0 6px 18px rgba(168,85,247,.35)}
+  .brand h1{margin:0;font-size:18px;letter-spacing:.2px}
+  .navlinks{display:flex;gap:8px;flex-wrap:wrap;overflow:auto}
+  .alink{padding:8px 12px;border-radius:999px;border:1px solid var(--border);background:#0a0a0a;color:var(--muted);
+    cursor:pointer;font-weight:700;white-space:nowrap}
+  .alink:hover{box-shadow:0 0 0 3px rgba(168,85,247,.15)}
+
+  /* Header area (enhanced) */
+  .header{padding:18px 18px 8px}
+  .header-grid{display:grid;grid-template-columns:1.2fr auto;align-items:end;gap:18px}
+  @media (max-width:860px){ .header-grid{grid-template-columns:1fr;align-items:stretch;gap:12px} }
+
+  .title{margin:0;letter-spacing:-.02em;display:flex;align-items:center;gap:10px}
+  .title .ink{font-size:clamp(26px,3.4vw,38px);background:linear-gradient(90deg,#fff, #d7c9ff 40%, #b48cff 75%, #fff);
+    -webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 6px 28px rgba(168,85,247,.18))}
+  .title::after{content:"";height:2px;width:0;display:block;background:linear-gradient(90deg,var(--purple),var(--purple-2));
+    border-radius:2px;margin-top:6px;transition:width .6s ease .1s}
+  .intro.in .title::after{width:92%}
+
+  .pip{display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--purple);
+    box-shadow:0 0 0 0 rgba(168,85,247,.45);animation:pulse 2.2s infinite ease-in-out}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(168,85,247,.45)}70%{box-shadow:0 0 0 10px rgba(168,85,247,0)}100%{box-shadow:0 0 0 0 rgba(168,85,247,0)}}
+
+  .lead{margin:10px 0 0;color:var(--muted);max-width:70ch;line-height:1.6;text-wrap:balance}
+  .lead strong,.hl{background:linear-gradient(90deg, rgba(168,85,247,.18), rgba(168,85,247,.07));
+    border:1px solid var(--border);padding:2px 6px;border-radius:8px;color:#eae3ff}
+  .lead-rail{position:relative;padding-left:14px}
+  .lead-rail::before{content:"";position:absolute;left:0;top:.35em;bottom:.35em;width:3px;border-radius:2px;
+    background:linear-gradient(180deg,var(--purple),var(--purple-2))}
+
+  /* Staggered reveal */
+  .intro .title, .intro .lead, .toolbar{opacity:0;transform:translateY(10px)}
+  .intro.in .title{opacity:1;transform:none;transition:opacity .5s ease, transform .5s ease}
+  .intro.in .lead{opacity:1;transform:none;transition:opacity .6s ease .08s, transform .6s ease .08s}
+  .toolbar.in{opacity:1;transform:none;transition:opacity .6s ease .16s, transform .6s ease .16s}
+  @media (prefers-reduced-motion: reduce){
+    .intro .title, .intro .lead, .toolbar{opacity:1;transform:none}
+    .title::after{transition:none}
+    .pip{animation:none}
+  }
+
+  .toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .control{display:flex;align-items:center;gap:8px;background:#0a0a0a;border:1px solid var(--border);
+    border-radius:12px;padding:8px 10px}
+  .control input,.control select{background:transparent;border:none;color:var(--text);outline:none}
+  .control input::placeholder{color:#9a8cc2}
+  .btn{padding:8px 12px;border-radius:12px;border:1px solid var(--border);background:transparent;color:var(--purple);
+    cursor:pointer;font-weight:700}
+  .btn:hover{box-shadow:0 0 0 3px rgba(168,85,247,.15), 0 8px 24px rgba(0,0,0,.4)}
+  .badge{padding:6px 10px;border:1px solid var(--border);border-radius:999px;background:#0a0a0a;color:var(--muted);font-weight:700}
+
+  /* Section shells */
+  .section{padding:12px 18px 18px}
+  .section + .section{padding-top:8px}
+  .section-h{display:flex;align-items:center;justify-content:space-between;margin:6px 0 10px}
+  .section-h h3{margin:0;font-size:18px;letter-spacing:.3px}
+  .section-h .hint{color:var(--muted);font-size:13px}
+  .divider{height:1px;background:linear-gradient(90deg,transparent,rgba(168,85,247,.35),transparent);border:none;margin:6px 0 12px}
+
+  /* TOP CAROUSEL */
+  .carousel{position:relative;border-radius:16px;border:1px solid var(--border);background:#0a0a0a;overflow:hidden}
+  .car-grid{display:grid;grid-template-columns:7fr 5fr;gap:12px;padding:12px}
+  .track{display:flex;gap:12px;overflow:auto;padding:4px;scroll-snap-type:x mandatory;scroll-behavior:smooth}
+  .c-card{min-width:clamp(260px,30vw,380px);aspect-ratio:16/10;position:relative;border-radius:14px;overflow:hidden;border:1px solid var(--border);
+    background:#080808;scroll-snap-align:center;cursor:pointer;transition:transform .25s ease, box-shadow .3s ease}
+  .c-card:hover{transform:translateY(-2px); box-shadow:0 16px 42px rgba(0,0,0,.5), 0 0 0 3px rgba(168,85,247,.18) inset}
+  .c-card.active{outline:2px solid var(--purple)}
+  .c-img{position:absolute;inset:0}
+  .c-img img{width:100%;height:100%;object-fit:cover}
+  .c-cap{position:absolute;left:0;right:0;bottom:0;padding:10px 12px;background:linear-gradient(180deg,transparent,rgba(0,0,0,.85))}
+  .c-title{margin:0;font-weight:900}
+  .c-desc{margin:2px 0 0;font-size:12px;color:var(--muted)}
+  .c-tag{position:absolute;left:10px;top:10px;padding:4px 8px;border-radius:999px;background:#00000090;border:1px solid var(--border);font-size:12px;color:var(--purple);font-weight:700}
+
+  .aside{border:1px solid var(--border);border-radius:14px;padding:12px;background:#0a0a0a;display:grid;grid-template-rows:auto 1fr auto;gap:8px}
+  .aside h4{margin:0 0 2px}
+  .meta{display:flex;gap:8px;flex-wrap:wrap}
+  .chip{padding:8px 12px;border-radius:999px;border:1px solid var(--border);background:transparent;color:var(--purple);
+    cursor:pointer;font-weight:700;letter-spacing:.2px;transition: box-shadow .2s ease, transform .12s ease}
+  .chip:hover{box-shadow:0 0 0 3px rgba(168,85,247,.15), 0 8px 24px rgba(0,0,0,.4)}
+  .chip:active{transform: translateY(1px) scale(.98)}
+  .clamp-4{display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+  .read{background:transparent;border:1px solid var(--border);border-radius:10px;padding:6px 10px;color:var(--muted);cursor:pointer}
+
+  .car-nav{position:absolute;inset:0;display:flex;align-items:center;justify-content:space-between;pointer-events:none}
+  .car-btn{pointer-events:auto;width:42px;height:42px;border-radius:999px;border:1px solid var(--border);background:#0a0a0a;color:var(--purple);font-weight:800;margin:0 8px}
+  .dots{display:flex;gap:8px;justify-content:center;padding:8px}
+  .dot{width:8px;height:8px;border-radius:50%;background:transparent;border:1px solid var(--border);opacity:.9}
+  .dot.active{background:var(--purple); border-color:var(--purple)}
+
+  @media (max-width: 900px){ .car-grid{grid-template-columns:1fr} }
+
+  /* Hero slider */
+  .hero{position:relative;border-radius:16px;overflow:hidden;border:1px solid var(--border)}
+  .hero-inner{position:relative;aspect-ratio:16/9;background:#050505}
+  .slide{position:absolute;inset:0;opacity:0;transition:opacity .45s ease}
+  .slide.active{opacity:1}
+  .slide img{width:100%;height:100%;display:block;object-fit:cover}
+  .fade-shadow{position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg, rgba(0,0,0,0.35), rgba(0,0,0,0) 32%, rgba(0,0,0,0) 68%, rgba(0,0,0,0.55))}
+  .hero-info{position:absolute;left:16px;bottom:16px;padding:10px 12px;border-radius:12px;background:#0000008a;border:1px solid var(--border);max-width:min(560px,80%)}
+  .hero-title{margin:0 0 4px;font-weight:800}
+  .hero-desc{margin:0;color:var(--muted)}
+  .hero-cta{position:absolute;left:16px;top:16px;display:flex;gap:8px;flex-wrap:wrap}
+  .pill{padding:8px 12px;border:1px solid var(--border);border-radius:999px;background:#0a0a0a;color:var(--text);font-weight:800;cursor:pointer}
+  .pill.filled{background:linear-gradient(135deg,var(--purple),var(--purple-2));border-color:transparent}
+
+  .nav{position:absolute;inset:0;display:flex;align-items:center;justify-content:space-between;padding:0 8px}
+  .nav button{width:42px;height:42px;border-radius:999px;border:1px solid var(--border);background:transparent;color:var(--purple);
+    cursor:pointer;font-weight:800;transition: box-shadow .2s ease, transform .12s ease}
+  .nav button:hover{box-shadow:0 0 0 3px rgba(168,85,247,.2), 0 10px 28px rgba(0,0,0,.45)}
+  .nav button:active{transform: translateY(1px) scale(.98)}
+
+  .progress{position:absolute;left:0;right:0;bottom:0;height:3px;background:rgba(255,255,255,.06)}
+  .bar{width:0;height:100%;background:linear-gradient(90deg,var(--purple),var(--purple-2));transition:width .1s linear}
+
+  .thumbs{display:flex;gap:8px;overflow:auto;padding:8px 6px 0}
+  .thumb{min-width:110px;aspect-ratio:16/10;border-radius:10px;overflow:hidden;border:1px solid var(--border);opacity:.85;cursor:pointer;background:#0a0a0a;position:relative}
+  .thumb.active{opacity:1;border-color:var(--purple)}
+  .thumb img{width:100%;height:100%;object-fit:cover;display:block}
+  .thumb::after{content:attr(data-t);position:absolute;left:6px;bottom:6px;font-size:11px;padding:3px 6px;border-radius:8px;background:#000000a6;border:1px solid var(--border);color:var(--muted)}
+
+  /* Overview / Stats */
+  .stats{display:grid;grid-template-columns:repeat(12,1fr);gap:12px}
+  .stat{grid-column:span 3;background:#0a0a0a;border:1px solid var(--border);border-radius:14px;padding:12px}
+  .stat h4{margin:0 0 2px;font-size:14px;color:var(--muted)}
+  .stat p{margin:0;font-size:22px;font-weight:900}
+  .ok{color:var(--success)} .warn{color:var(--warning)} .bad{color:var(--danger)}
+  @media (max-width:900px){ .stat{grid-column:span 6} }
+  @media (max-width:640px){ .stat{grid-column:span 12} }
+
+  /* Sections grid */
+  .sections{display:grid;grid-template-columns:repeat(12,1fr);gap:12px}
+  .section-card{grid-column:span 4;background:#0a0a0a;border:1px solid var(--border);border-radius:14px;padding:12px;position:relative;overflow:hidden}
+  .section-card h4{margin:0 0 4px;display:flex;align-items:center;gap:8px}
+  .section-card p{margin:0;color:var(--muted)}
+  .section-card .act{position:absolute;right:12px;bottom:12px}
+  .section-card .act .btn{padding:6px 10px}
+  @media (max-width:900px){ .section-card{grid-column:span 6} }
+  @media (max-width:640px){ .section-card{grid-column:span 12} }
+
+  /* Grid Gallery */
+  .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:12px;margin-top:16px}
+  .grid.compact{gap:8px}
+  .card{position:relative;border:1px solid var(--border);border-radius:14px;overflow:hidden;cursor:pointer;background:#0a0a0a;transition: box-shadow .3s ease, transform .25s ease}
+  .card:hover{box-shadow:0 16px 42px rgba(0,0,0,.5), 0 0 0 3px rgba(168,85,247,.18) inset; transform: translateY(-2px)}
+  .card img{width:100%;height:100%;object-fit:cover;display:block}
+  .tag{position:absolute;left:10px;top:10px;padding:4px 8px;border-radius:999px;background:#00000090;border:1px solid var(--border);font-size:12px;color:var(--purple);font-weight:700}
+  .cap{position:absolute;left:0;right:0;bottom:0;padding:10px 12px;background:linear-gradient(180deg, transparent, rgba(0,0,0,.85))}
+  .cap .t{font-weight:800;margin:0}
+  .cap .d{margin:2px 0 0;font-size:12px;color:var(--muted)}
+
+  .span-6{grid-column:span 6} .span-4{grid-column:span 4} .span-8{grid-column:span 8} .span-12{grid-column:span 12}
+  .h-200{height:200px} .h-260{height:260px} .h-320{height:320px}
+
+  /* ---------- Responsive: automatic (CSS breakpoints) ---------- */
+  @media (max-width: 1024px){
+    .title .ink{font-size:clamp(24px,3.2vw,32px)}
+    .hero-inner{aspect-ratio:16/10}
+  }
+  @media (max-width: 900px){
+    .span-6{grid-column:span 12} .span-8{grid-column:span 12} .span-4{grid-column:span 6}
+    .h-320{height:260px}
+  }
+  @media (max-width: 640px){
+    .grid{grid-template-columns:repeat(6,1fr)}
+    .span-4{grid-column:span 6} .span-6{grid-column:span 6} .span-8{grid-column:span 6}
+    .thumbs{display:none} /* hide thumbs on small screens */
+    .hero-inner{aspect-ratio:1/1}
+    .nav button{width:38px;height:38px}
+    .control{padding:6px 8px}
+    .btn{padding:6px 9px}
+  }
+
+  /* ---------- Forced modes via .desktop / .mobile ---------- */
+  .panel.desktop .grid{grid-template-columns:repeat(12,1fr)}
+  .panel.desktop .thumbs{display:flex}
+  .panel.desktop .hero-inner{aspect-ratio:16/9}
+
+  .panel.mobile .grid{grid-template-columns:repeat(6,1fr)}
+  .panel.mobile .span-4{grid-column:span 6}
+  .panel.mobile .span-6{grid-column:span 6}
+  .panel.mobile .span-8{grid-column:span 6}
+  .panel.mobile .thumbs{display:none}
+  .panel.mobile .hero-inner{aspect-ratio:1/1}
+  .panel.mobile .title .ink{font-size:22px}
+  .panel.mobile .control{padding:6px 8px}
+  .panel.mobile .btn{padding:6px 9px}
+
+  /* Lightbox */
+  .lightbox{position:fixed;inset:0;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;z-index:50}
+  .lb-inner{width:min(1100px,92vw);max-height:88vh;background:#0b0b0b;border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);
+    overflow:hidden;display:grid;grid-template-rows:auto 1fr}
+  .lb-head{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border-bottom:1px solid var(--border)}
+  .lb-title{margin:0;font-weight:800}
+  .lb-close{cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--purple);border-radius:8px;padding:6px 10px;font-weight:800}
+  .lb-media{position:relative;background:#000;display:grid;place-items:center}
+  .lb-media img{max-width:100%;max-height:82vh;object-fit:contain}
+  .lb-nav{position:absolute;left:0;right:0;top:50%;display:flex;justify-content:space-between;transform:translateY(-50%);padding:0 8px}
+  .lb-btn{width:42px;height:42px;border-radius:999px;border:1px solid var(--border);background:transparent;color:var(--purple);font-weight:800}
+
+  /* Motion accessibility */
+  @media (prefers-reduced-motion: reduce){
+    .slide{transition:none}
+    .card{transition:none}
+    .nav button{transition:none}
+  }
+    /* -------- Responsive overrides for gallery -------- */
+@media (max-width:900px){
+  .grid{grid-template-columns:repeat(12,1fr)}
+  .grid .card{grid-column:span 6 !important; height:auto; min-height:200px}
+}
+
+@media (max-width:640px){
+  .grid{grid-template-columns:repeat(12,1fr)}
+  .grid .card{grid-column:span 12 !important; height:auto; min-height:200px}
+}
+  /* Desktop/Tablet: show normal nav */
+.desktop-nav { display: flex; }
+.mobile-nav { display: none; }
+
+/* Mobile: swap */
+@media (max-width:640px) {
+  .desktop-nav { display: none; }
+  .mobile-nav { display: block; position: relative; }
+  .hamburger {
+    font-size: 22px;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 6px 10px;
+    color: var(--purple);
+    cursor: pointer;
+  }
+    @media (max-width:640px){
+  .mobile-nav { display:block; }
+  .mobile-menu {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 335px;
+    max-width: 94vw;
+    height: 100vh;
+    background: #0b0b0b;
+    border-right: 1px solid var(--border);
+    z-index: 1050;
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    box-shadow: 0 10px 48px #000c;
+    transform: translateX(-100%);
+    transition: transform .35s cubic-bezier(.26,1,.32,1);
+  }
+  .mobile-menu.open { transform: translateX(0);}
+  .mobile-menu-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 18px 10px 18px;
+    border-bottom: 1px solid var(--border);
+    min-height: 56px;
+  }
+  .mobile-menu-logo {
+    display: flex;
+    align-items: center;
+    font-size: 24px;
+    color: #fff;
+    font-weight: 700;
+    gap: 8px;
+  }
+  .mobile-menu-logo img {
+    height: 32px; width: auto; margin-right:8px;
+  }
+  .close-btn {
+    background: none;
+    border: none;
+    font-size: 32px;
+    color: var(--muted);
+    cursor: pointer;
+    padding: 2px 8px; margin-left: auto;
+  }
+  .mobile-menu-items {
+    flex: 1; /* takes all space */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 32px;
+    padding: 40px 0 16px 0;
+  }
+  .mobile-menu-items .menu-link {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 21px;
+    text-align: center;
+    font-weight: 500;
+    padding: 8px 0;
+    width: 92%;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: background .18s,color .18s;
+  }
+  .mobile-menu-items .menu-link:hover {
+    background: rgba(168,85,247,0.10);
+    color: var(--purple);
+  }
+  .whatsapp-btn {
+    width: 85%;
+    margin: 10px auto 8px auto;
+    background: #25d366;
+    color: #222;
+    border: none;
+    border-radius: 10px;
+    font-size: 19px;
+    font-weight:700;
+    padding: 12px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    box-shadow: 0 2px 8px #18b5513a;
+    cursor: pointer;
+  }
+  .whatsapp-btn .wa-icon {
+    font-size: 22px;
+    margin-right: 4px;
+  }
+  .login-btn {
+    width: 92%;
+    margin: 8px auto 0 auto;
+    background: transparent;
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 18px;
+    font-weight: 500;
+    padding: 12px 0;
+    cursor: pointer;
+    transition: border .18s,color .18s;
+  }
+  .login-btn:hover {
+    color: var(--purple);
+    border-color: var(--purple);
+  }
+  .drawer-overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    z-index: 1000;
+  }
+}
+
+  .mobile-menu {
+    position: absolute;
+    items: center;
+    top: 110%;
+    right: 0;
+    background: #0b0b0b;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 8px;
+    z-index: 100;
+  }
+  .mobile-menu button {
+    background: none;
+    border: none;
+    color: var(--text);
+    text-align: left;
+    padding: 6px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  .mobile-menu button:hover {
+    background: rgba(168,85,247,0.12);
+  }
+}
+
+@media (max-width:640px) {
+  .mobile-pill-vertical {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    align-items: stretch;
+    padding: 30px 18px 16px 18px;
+    background: transparent;
+    width: 100%;
+  }
+  .pill-link {
+    padding: 12px 0;
+    border-radius: 999px;
+    border: 2px solid var(--border, #a855f7);
+    background: #181118;
+    color: #f6f3ff;
+    font-size: 18px;
+    font-weight: 700;
+    outline: none;
+    cursor: pointer;
+    width: 50%; /* full width in drawer */
+    height: 50%;
+    text-align: center;
+    margin: 0;
+    transition: background .18s, color .18s, border .15s;
+  }
+  .pill-link:hover,
+  .pill-link:focus {
+    color: var(--purple, #a855f7);
+    background: rgba(168,85,247,0.09);
+    border-color: var(--purple, #a855f7);
+  }
+}
+/* Hide by default */
+.mobile-pill-vertical {
+  display: none;
+}
+
+/* Show only on mobile screens */
+@media (max-width:640px) {
+  .mobile-pill-vertical {
+    display: flex;
+  }
+}
+
+`;
+
+/* ---------- Demo data ---------- */
+const IMGS = [
+  { title: "Dashboard",    desc: "Live KPIs and overview.", long:"Get a real-time pulse on KPIs, revenue, uptime, and operational health with drill-downs and alerting.", src: image1, cat: "Overview" },
+  { title: "Analytics",    desc: "Charts & deep insights.", long:"Build interactive charts, compare cohorts, and export reports to CSV/PDF. Great for weekly reviews.", src: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=1600&auto=format&fit=crop", cat: "Analytics" },
+  { title: "CRM",          desc: "Profiles & timeline.",  long:"Track user journeys, lifecycle stages, and automate follow-ups with tags, notes, and activity streams.", src: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=1600&auto=format&fit=crop", cat: "Users" },
+  { title: "Tasks",        desc: "Boards & sprints.",     long:"Plan sprints, assign tasks, and visualize progress in Kanban and timeline views with SLA reminders.", src: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=1600&auto=format&fit=crop", cat: "Product" },
+  { title: "Collaboration",desc: "Comments & mentions.",  long:"Centralize feedback, mentions, and decision logs with inline comments and quick reactions.", src: "https://images.unsplash.com/photo-1529336953121-ad5a0d43d0d2?q=80&w=1600&auto=format&fit=crop", cat: "Collab" },
+  { title: "Reports",      desc: "Export PDF/CSV.",       long:"Schedule report deliveries, watermark PDFs, and keep your stakeholders aligned without manual work.", src: "https://images.unsplash.com/photo-1531496681078-17f36b0d3c06?q=80&w=1600&auto=format&fit=crop", cat: "Analytics" },
+  { title: "Automation",   desc: "Workflows & triggers.", long:"Trigger workflows on events, update records, and notify teams with visual builders and audit trails.", src: "https://images.unsplash.com/photo-1545235617-9465d2a55698?q=80&w=1600&auto=format&fit=crop", cat: "Product" },
+  { title: "Settings",     desc: "Roles & permissions.",  long:"Configure SSO, RBAC, audit logs, and environment flags with safe defaults for enterprise.", src: "https://images.unsplash.com/photo-1515879218367-8466d910aaa4?q=80&w=1600&auto=format&fit=crop", cat: "Users" },
+];
+const CATS = ["All", ...Array.from(new Set(IMGS.map(i => i.cat)))]
+const CAT_ICONS = { All: "⭐", Home: "🏁", About: "📈", Cars: "👥", Support: "🧩"};
+
+const SECTIONS = [
+  { key:"Home",  icon:"🏁", title:"Home",  blurb:"At-a-glance KPIs and status across your work." },
+  { key:"About",  icon:"📈", title:"About", blurb:"Dashboards, charts, and reports to explore trends." },
+  { key:"Cars",      icon:"👥", title:"Cars",     blurb:"Manage profiles, roles, and timelines." },
+  { key:"Support",    icon:"🧩", title:"Support",   blurb:"Boards, tasks, sprints, and automation." },
   
-//     {
-//       src: "https://images.unsplash.com/photo-1581094794329-c8112a89af12?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&h=900",
-//       title: "Interviews That Get Smarter with Every Answer!",
-//       alt: "AI assistant conducting virtual interview",
-//       // style: { width: '100%', height: '100vh', objectFit: 'cover' }
-//     },
-//     // {
-//     //   src: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&h=900",
-//     //   title: "Real-Time Analytics",
-//     //   alt: "Dashboard showing candidate assessment metrics",
-//     //   style: { width: '100%', height: '100vh', objectFit: 'cover' }
-//     // },
-//     {
-//       src: "https://images.unsplash.com/photo-1573164713988-8665fc963095?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&h=900",
-//       title: "This Is How SpaceX Interviews—Now You Can Too!",
-//       alt: "Diverse candidates participating in virtual interviews",
-//       // style: { width: '100%', height: '100vh', objectFit: 'cover' }
-//     },
-//     // {
-//     //   src: "https://images.unsplash.com/photo-1521791136064-7986c2920216?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&h=900",
-//     //   title: "Skill Assessments",
-//     //   alt: "Coding test interface with AI evaluation",
-//     //   style: { width: '100%', height: '100vh', objectFit: 'cover' }
-//     // },
-//     {
-//       src: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&h=900",
-//       title: "From Resume to Decision in 48 Hours!",
-//       alt: "Smiling candidate during video interview",
-//       // style: { width: '100%', height: '100vh', objectFit: 'cover' }
-//     }
-//   ];
+];
 
-// // Updated radial menu items
-// // const menuItems = [
-// //     { label: "HOME", angle: 0, href: "#home" },
-// //     { label: "SOLUTIONS", angle: 72, href: "#solutions" },
-// //     { label: "FEATURES", angle: 144, href: "#features" },
-// //     { label: "ABOUT", angle: 216, href: "#about" },
-// //     { label: "CONTACT", angle: 288, href: "#contact" },
-// //   ];
-  
-//   const RadialMenu = () => {
-//     const radius = 100; // Reduced radius for mobile
-//     const [isOpen, setIsOpen] = useState(false);
-//     const [hoveredItem, setHoveredItem] = useState(null);
-  
-//     const handleClick = (href, e) => {
-//       e.preventDefault();
-//       setIsOpen(false);
-  
-//       setTimeout(() => {
-//         const id = href.replace("#", "");
-//         const el = document.getElementById(id);
-//         if (el) {
-//           const yOffset = -40;
-//           const y = el.getBoundingClientRect().top + window.pageYOffset + yOffset;
-//           window.scrollTo({ top: y, behavior: "smooth" });
-//         }
-//       }, 400);
-//     };
-  
-//     const menuItems = [
-//       { label: "Profile", angle: 0, href: "#profile", icon: "👤" },
-//       { label: "Work", angle: 90, href: "#work", icon: "💼" },
-//       { label: "Projects", angle: 180, href: "#projects", icon: "🚀" },
-//       { label: "About", angle: 270, href: "#about", icon: "ℹ️" },
-//     ];
-  
-//     return (
-//       <div className="fixed top-4 right-4 z-[100] text-white">
-//         <motion.div
-//           className="relative w-[60px] h-[60px] md:w-[80px] md:h-[80px] rounded-full border border-primary-800 flex items-center justify-center"
-//           animate={{ rotate: [0, 360] }}
-//           transition={{ repeat: Infinity, duration: 30, ease: "linear" }}
-//         >
-//           <motion.button
-//             onClick={() => setIsOpen(!isOpen)}
-//             className="w-[50px] h-[50px] md:w-[60px] md:h-[60px] rounded-full bg-gradient-to-br from-purple-900/80 via-indigo-900/80 to-blue-900/80 border border-purple-500 text-xs font-bold backdrop-blur-sm flex items-center justify-center text-white interactive-glow"
-//             whileHover={{ 
-//               scale: 1.05, 
-//               boxShadow: "0 0 15px rgba(168, 85, 247, 0.5)",
-//             }}
-//             whileTap={{ scale: 0.98 }}
-//             animate={{ 
-//               boxShadow: ["0 0 0px rgba(168, 85, 247, 0.3)", "0 0 10px rgba(168, 85, 247, 0.5)", "0 0 0px rgba(168, 85, 247, 0.3)"],
-//             }}
-//             transition={{ duration: 2, repeat: Infinity }}
-//           >
-//             <span className="animate-text-shimmer">{isOpen ? "CLOSE" : "MENU"}</span>
-//           </motion.button>
-//         </motion.div>
-  
-//         <AnimatePresence>
-//           {isOpen && (
-//             <>
-//               <motion.div
-//                 className="fixed inset-0 bg-dark-950/90 backdrop-blur-md z-[40]"
-//                 initial={{ opacity: 0 }}
-//                 animate={{ opacity: 1 }}
-//                 exit={{ opacity: 0 }}
-//                 transition={{ duration: 0.4 }}
-//                 onClick={() => setIsOpen(false)}
-//               />
-  
-//               <motion.div
-//                 className="fixed top-8 right-8 w-[220px] h-[220px] md:w-[280px] md:h-[280px] rounded-full border border-primary-500 z-[50] shadow-glow-purple-lg"
-//                 initial={{ opacity: 0, scale: 0 }}
-//                 animate={{ opacity: 1, scale: 1 }}
-//                 exit={{ opacity: 0, scale: 0 }}
-//                 transition={{ duration: 0.5 }}
-//               >
-//                 <div className="absolute inset-0 bg-[conic-gradient(from_0deg,_#a855f7_0deg,_#a855f7_10deg,_transparent_10deg,_transparent_72deg,_#a855f7_72deg,_#a855f7_82deg,_transparent_82deg)] opacity-40 rounded-full animate-spin-slow pointer-events-none" />
-                
-//                 {menuItems.map((item) => {
-//                   const angleRad = (item.angle * Math.PI) / 180;
-//                   const x = radius * Math.cos(angleRad);
-//                   const y = radius * Math.sin(angleRad);
-  
-//                   return (
-//                     <div
-//                       key={item.label}
-//                       className="absolute z-[60]"
-//                       style={{
-//                         left: `calc(50% + ${x}px - 30px)`,
-//                         top: `calc(50% - ${y}px - 30px)`,
-//                       }}
-//                     >
-//                       <motion.div 
-//                         className="relative w-[60px] h-[60px] rounded-full border border-[#6b21a8]/60 flex items-center justify-center"
-//                         onHoverStart={() => setHoveredItem(item.label)}
-//                         onHoverEnd={() => setHoveredItem(null)}
-//                       >
-//                         <motion.a
-//                           href={item.href}
-//                           className="w-[50px] h-[50px] rounded-full bg-gradient-to-br from-purple-900/80 via-indigo-900/80 to-blue-900/80 border border-purple-500 text-white font-bold text-xs backdrop-blur-sm flex flex-col items-center justify-center cursor-pointer z-[70] interactive-glow"
-//                           whileHover={{ 
-//                             scale: 1.1, 
-//                             boxShadow: "0 0 15px rgba(168, 85, 247, 0.5)",
-//                           }}
-//                           whileTap={{ scale: 0.98 }}
-//                           animate={{ 
-//                             boxShadow: hoveredItem === item.label 
-//                               ? "0 0 20px rgba(168, 85, 247, 0.8)"
-//                               : ["0 0 0px rgba(168, 85, 247, 0.3)", "0 0 10px rgba(168, 85, 247, 0.5)", "0 0 0px rgba(168, 85, 247, 0.3)"],
-//                           }}
-//                           transition={{ duration: 2, repeat: Infinity }}
-//                           onClick={(e) => handleClick(item.href, e)}
-//                           tabIndex={isOpen ? 0 : -1}
-//                           aria-label={item.label}
-//                         >
-//                           <span className="text-lg mb-1">{item.icon}</span>
-//                           <span className="animate-text-shimmer text-xs">{item.label}</span>
-//                         </motion.a>
-//                       </motion.div>
-//                     </div>
-//                   );
-//                 })}
-//               </motion.div>
-//             </>
-//           )}
-//         </AnimatePresence>
-//       </div>
-//     );
-//   };
-  
-
-// function FullScreenCarousel() {
-//   const [current, setCurrent] = React.useState(0);
-
-//   React.useEffect(() => {
-//     const interval = setInterval(() => {
-//       setCurrent((c) => (c === projectImages.length - 1 ? 0 : c + 1));
-//     }, 4000);
-//     return () => clearInterval(interval);
-//   }, []);
-
-//   const prev = () => setCurrent((c) => (c === 0 ? projectImages.length - 1 : c - 1));
-//   const next = () => setCurrent((c) => (c === projectImages.length - 1 ? 0 : c + 1));
-
-//   return (
-//     <section className="relative w-full h-screen flex items-center justify-center bg-[#1a1333] overflow-hidden">
-//       <div className="absolute inset-0 z-0">
-//         <div className="w-full h-full bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-20" />
-//       </div>
-      
-//       <RadialMenu />
-
-//       <img
-//         src={projectImages[current].src}
-//         alt={projectImages[current].title}
-//         className="absolute inset-0 w-full h-full object-cover object-center transition-all duration-500 z-0"
-//         style={{ filter: "brightness(0.7)" }}
-//       />
-//       <div className="relative z-10 flex pt-60 flex-col items-center justify-center w-full h-full">
-//         <h3 className="text-3xl md:text-5xl font-bold text-white drop-shadow mb-6  px-8 py-4 rounded-2xl">
-//          {projectImages[current].title}
-//         </h3>
-//         <div className="flex justify-center gap-3 mt-8">
-//           {projectImages.map((_, idx) => (
-//             <button
-//               key={idx}
-//               onClick={() => setCurrent(idx)}
-//               className={`w-4 h-4 rounded-full border-2 border-purple-400 ${
-//                 idx === current ? "bg-purple-400" : "bg-purple-900"
-//               }`}
-//               aria-label={`Go to slide ${idx + 1}`}
-//             />
-//           ))}
-//         </div>
-//       </div>
-//       <div className="absolute inset-0 bg-gradient-to-t from-[#1a1333] via-transparent to-[#1a1333]/60 pointer-events-none" />
-//     </section>
-//   );
-// }
-
-// const AuthHero = () => {
-//   const handleExploreSolutions = () => {
-//     window.location.href = "https://sklassics-ai.com/";
-//   };
-
-//   return (
-//     <div className="min-h-screen bg-gradient-to-br from-[#0d0b33] to-[#0b0e2e] text-white flex items-center px-4 sm:px-10 md:px-20">
-//       <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-        
-//         <div className="z-10">
-//           <p className="text-sm text-purple-300 font-medium">
-//             The <span className="text-purple-500">future</span> of business technology
-//           </p>
-//           <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold leading-tight mt-4">
-//             Transform Your Business<br />
-//             <span className="text-purple-200">With Advanced AI Solutions</span>
-//           </h1>
-//           <p className="text-gray-400 mt-4">
-//   • IT training with guaranteed placements through industry-focused curriculum and hands-on learning.<br />
-//   {/* • AI-powered mock interview platform that simulates real-world scenarios and delivers instant, personalized feedback.<br /> */}
-//   • Smart performance tracking with question analysis, scoring, and improvement tips to boost interview readiness.
-// </p>
-
-
-
-//           {/* <div className="mt-8 space-y-3">
-//             <button
-//               onClick={handleExploreSolutions}
-//               className="flex items-center gap-3 px-4 py-3 border border-[#1d2033] rounded-md w-fit bg-[#101223] hover:bg-gradient-to-br from-purple-800/20 to-transparent transition duration-300"
-//             >
-//               <FaRegSquare />
-//               <span className="font-medium">Explore Solutions</span>
-//             </button>
-//             <button 
-//               onClick={() => window.open("https://sklassics-ai.com/", "_blank")}
-//               className="flex items-center gap-3 px-4 py-3 border border-[#1d2033] rounded-md w-fit bg-[#101223] hover:bg-gradient-to-br from-purple-800/20 to-transparent transition duration-300"
-//             >
-//               <span>Platform Features</span>
-//             </button>
-//             <button 
-//               onClick={() => window.open("https://sklassics-ai.com/contact", "_blank")}
-//               className="flex items-center gap-3 px-4 py-3 border border-[#1d2033] rounded-md w-fit bg-[#101223] hover:bg-gradient-to-br from-purple-800/20 to-transparent transition duration-300"
-//             >
-//               <span>Contact Our Team</span>
-//             </button>
-//           </div> */}
-//         </div>
-
-//         <div className="relative flex justify-center items-center">
-//           <div className="absolute w-[300px] h-[300px] sm:w-[400px] sm:h-[400px] md:w-[500px] md:h-[500px] rounded-full bg-purple-800 blur-3xl opacity-40"></div>
-//           <img
-//             src={lmsHero}
-//             alt="AI Solutions Platform"
-//             className="relative w-full max-w-[500px] h-auto object-contain z-10"
-//           />
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// const Faster = () => {
-//   return (
-//     <section className="bg-[#0a1026] py-16 px-4 sm:px-6">
-//       <div className="max-w-6xl mx-auto">
-//         <h2 className="text-2xl sm:text-3xl md:text-5xl font-extrabold text-white text-center mb-4">
-//           Smarter Business Operations.
-//         </h2>
-//         <p className="text-zinc-400 text-center max-w-2xl mx-auto mb-12 text-sm sm:text-base md:text-lg">
-//         Our AI solutions deliver automation, data insights, and process optimization. They empower teams to make faster decisions, reduce manual effort, and drive measurable business growth.
-//         </p>
-
-//         <div className="bg-[#11182b] border border-zinc-700 rounded-2xl shadow-xl flex flex-col md:flex-row items-center md:items-stretch overflow-hidden"
-//              style={{ minHeight: 400 }}>
-//           <div className="flex-1 flex flex-col justify-center p-6 sm:p-8 md:p-12">
-//             <h3 className="text-lg sm:text-xl md:text-2xl font-semibold text-white mb-3">
-//               <span className="font-bold">Optimized for business transformation</span>
-//             </h3>
-//             <p className="text-zinc-400 mb-6 sm:mb-8 text-sm sm:text-base md:text-lg">
-//               Our AI systems provide the most effective solutions for automating and optimizing your business processes.
-//             </p>
-//             <a
-//               href="https://sklassics-ai.com/"
-//               target="_blank"
-//               rel="noopener noreferrer"
-//               className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-zinc-600 text-white font-medium hover:bg-purple-700/20 transition text-sm w-auto"
-//             >
-//               Visit SKlassic AI <span className="text-purple-400">&rarr;</span>
-//             </a>
-//           </div>
-//           <div className="flex-1 flex items-center justify-center relative min-h-[250px] bg-transparent">
-//             <img
-//               src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1600&q=80"
-//               alt="AI Solutions Visualization"
-//               className="w-full max-w-[420px] h-auto object-contain mx-auto"
-//               style={{ filter: "drop-shadow(0 0 60px #a78bfa66)" }}
-//             />
-//           </div>
-//         </div>
-//       </div>
-//     </section>
-//   );
-// };
-
-// const WhyTrustUs = () => {
-//   const features = [
-//     {
-//       category: 'Business Solutions',
-//       items: [
-//         { icon: <LucideMessageCircle size={20} />, title: 'Process Automation' },
-//         { icon: <LucideLayoutDashboard size={20} />, title: 'Data Analytics' },
-//         { icon: <LucideSearch size={20} />, title: 'AI-Powered Insights' },
-//       ],
-//     },
-//     {
-//       category: 'Enterprise Features',
-//       items: [
-//         { icon: <LucideBarChart2 size={20} />, title: 'Performance Metrics' },
-//         { icon: <LucideBell size={20} />, title: 'Real-time Alerts' },
-//         { icon: <LucideLink size={20} />, title: 'System Integration' },
-//       ],
-//     },
-//     {
-//       category: 'Quality Standards',
-//       items: [
-//         { icon: <LucideShield size={20} />, title: 'Enterprise Security' },
-//         { icon: <LucideDownload size={20} />, title: 'Data Export' },
-//         { icon: <LucideClock size={20} />, title: '24/7 Monitoring' },
-//       ],
-//     },
-//   ];
-
-//   return (
-//     <section className="bg-[#0E1321] text-white py-16 px-4 sm:px-8 md:px-16">
-//       <div className="max-w-7xl mx-auto">
-//         <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-4">
-//           <span className="bg-gradient-to-r from-purple-400 to-white bg-clip-text text-transparent">
-//             Why choose SKlassic AI?
-//           </span>
-//         </h2>
-//         <p className="text-gray-300 text-base sm:text-lg mb-8 sm:mb-12 max-w-3xl">
-//           We're redefining business technology with cutting-edge AI solutions, automation, and data analytics.
-//         </p>
-
-//         {features.map((group, i) => (
-//           <div key={i} className="mb-8 sm:mb-10">
-//             <h3 className="text-xs sm:text-sm text-purple-400 font-semibold mb-4 sm:mb-6">{group.category}</h3>
-//             <div className="grid gap-6 sm:gap-8 sm:grid-cols-2 lg:grid-cols-3">
-//               {group.items.map((item, j) => (
-//                 <div key={j} className="flex items-start space-x-3 sm:space-x-4">
-//                   <div className="text-purple-300 mt-1">{item.icon}</div>
-//                   <div>
-//                     <h4 className="text-white font-semibold text-base sm:text-lg mb-1">{item.title}</h4>
-//                     <p className="text-gray-400 text-xs sm:text-sm">
-//                       Our platform ensures the highest standards for your business operations.
-//                     </p>
-//                   </div>
-//                 </div>
-//               ))}
-//             </div>
-//           </div>
-//         ))}
-//       </div>
-//     </section>
-//   );
-// };
-
-// const FeatureCarousel = () => {
-//     const scrollRef = useRef(null);
-//     const cards = [
-//       {
-//         title: "Process Automation",
-//         desc: "Streamline operations with intelligent automation solutions.",
-//         icon: "🤖",
-//       },
-//       {
-//         title: "Data Analytics",
-//         desc: "Powerful insights from your business data in real-time.",
-//         icon: "📊",
-//       },
-//       {
-//         title: "AI Integration",
-//         desc: "Seamlessly integrate AI into your existing systems.",
-//         icon: "🧠",
-//       },
-//       {
-//         title: "Enterprise Security",
-//         desc: "Military-grade security for your sensitive data.",
-//         icon: "🔒",
-//       },
-//       {
-//         title: "Cloud Solutions",
-//         desc: "Scalable cloud-based infrastructure for any business size.",
-//         icon: "☁️",
-//       },
-//     ];
-  
-//     const scroll = (direction) => {
-//       const scrollAmount = 350;
-//       if (scrollRef.current) {
-//         scrollRef.current.scrollBy({
-//           left: direction === "left" ? -scrollAmount : scrollAmount,
-//           behavior: "smooth",
-//         });
-//       }
-//     };
-  
-//     return (
-//       <div className="bg-[#0a0c1b] text-white py-16 px-4">
-//         <div className="text-center max-w-3xl mx-auto mb-8 sm:mb-12">
-//           <p className="text-xs sm:text-sm text-purple-400 font-medium">SKlassic AI Features</p>
-//           <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mt-2 mb-3 sm:mb-4">Your business transformation platform</h2>
-//           <p className="text-gray-400 text-sm sm:text-base">
-//             Experience the future of business operations with our comprehensive AI solutions.
-//           </p>
-//         </div>
-  
-//         <div className="relative">
-//           <div
-//             ref={scrollRef}
-//             className="flex overflow-x-auto no-scrollbar scroll-smooth space-x-4 sm:space-x-6 px-2"
-//           >
-//             {cards.map((card, index) => (
-//               <div
-//                 key={index}
-//                 className="min-w-[240px] sm:min-w-[280px] md:min-w-[300px] bg-[#101223] rounded-xl border border-[#1d2033] p-4 sm:p-6 hover:bg-gradient-to-br from-purple-800/20 to-transparent transition duration-300"
-//               >
-//                 <div className="text-2xl mb-3 sm:mb-4">{card.icon}</div>
-//                 <h3 className="text-lg sm:text-xl font-semibold mb-2">{card.title}</h3>
-//                 <p className="text-gray-400 text-xs sm:text-sm mb-3 sm:mb-4">{card.desc}</p>
-//               </div>
-//             ))}
-//           </div>
-  
-//           <div className="flex justify-center gap-4 sm:gap-6 mt-6">
-//             <button
-//               onClick={() => scroll("left")}
-//               className="bg-[#1d2033] hover:bg-[#292d45] p-2 rounded-full text-white"
-//               aria-label="Scroll left"
-//             >
-//               <FaArrowLeft />
-//             </button>
-//             <button
-//               onClick={() => scroll("right")}
-//               className="bg-[#1d2033] hover:bg-[#292d45] p-2 rounded-full text-white"
-//               aria-label="Scroll right"
-//             >
-//               <FaArrowRight />
-//             </button>
-//           </div>
-//         </div>
-//       </div>
-//     );
-//   };
-
-// const AiInterviewDisplay = () => {
-//   return (
-//     <div className="bg-[#0a0a23] text-white">
-//       <FullScreenCarousel />
-//       <AuthHero />
-//       <Faster />
-//       <WhyTrustUs />
-//       <FeatureCarousel />
-//       <Footer />
-//     </div>
-//   );
-// };
-
-// export default AiInterviewDisplay;
-
-
-// import React, { useState, useRef } from "react";
-// import lmsHero from "../../assets/lms.png"; 
-// import { motion, AnimatePresence } from "framer-motion";
-// import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
-// import { 
-//   LucideMessageCircle, 
-//   LucideLayoutDashboard, 
-//   LucideSearch,
-//   LucideBarChart2,
-//   LucideBell,
-//   LucideLink,
-//   LucideShield,
-//   LucideDownload,
-//   LucideClock
-// } from 'lucide-react';
-// import Footer from "../../animated-portfolio/Footer";
-
-// const projectImages = [
-//   {
-//     src: "https://images.unsplash.com/photo-1581094794329-c8112a89af12?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&h=900",
-//     title: "Interviews That Get Smarter with Every Answer!",
-//     alt: "AI assistant conducting virtual interview"
-//   },
-//   {
-//     src: "https://images.unsplash.com/photo-1573164713988-8665fc963095?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&h=900",
-//     title: "This Is How SpaceX Interviews—Now You Can Too!",
-//     alt: "Diverse candidates participating in virtual interviews"
-//   },
-//   {
-//     src: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&h=900",
-//     title: "From Resume to Decision in 48 Hours!",
-//     alt: "Smiling candidate during video interview"
-//   }
-// ];
-
-// const RadialMenu = () => {
-//   const radius = 80; // Further reduced for mobile
-//   const [isOpen, setIsOpen] = useState(false);
-//   const [hoveredItem, setHoveredItem] = useState(null);
-
-//   const handleClick = (href, e) => {
-//     e.preventDefault();
-//     setIsOpen(false);
-
-//     setTimeout(() => {
-//       const id = href.replace("#", "");
-//       const el = document.getElementById(id);
-//       if (el) {
-//         const yOffset = -40;
-//         const y = el.getBoundingClientRect().top + window.pageYOffset + yOffset;
-//         window.scrollTo({ top: y, behavior: "smooth" });
-//       }
-//     }, 400);
-//   };
-
-//   const menuItems = [
-//     { label: "Home", angle: 0, href: "#home", icon: "🏠" },
-//     { label: "Features", angle: 90, href: "#features", icon: "✨" },
-//     { label: "Solutions", angle: 180, href: "#solutions", icon: "🚀" },
-//     { label: "Contact", angle: 270, href: "#contact", icon: "📞" },
-//   ];
-
-//   return (
-//     <div className="fixed top-4 right-4 z-[100] text-white">
-//       <motion.div
-//         className="relative w-[50px] h-[50px] md:w-[60px] md:h-[60px] rounded-full border border-primary-800 flex items-center justify-center"
-//         animate={{ rotate: [0, 360] }}
-//         transition={{ repeat: Infinity, duration: 30, ease: "linear" }}
-//       >
-//         <motion.button
-//           onClick={() => setIsOpen(!isOpen)}
-//           className="w-[40px] h-[40px] md:w-[50px] md:h-[50px] rounded-full bg-gradient-to-br from-purple-900/80 via-indigo-900/80 to-blue-900/80 border border-purple-500 text-[10px] md:text-xs font-bold backdrop-blur-sm flex items-center justify-center text-white interactive-glow"
-//           whileHover={{ 
-//             scale: 1.05, 
-//             boxShadow: "0 0 15px rgba(168, 85, 247, 0.5)",
-//           }}
-//           whileTap={{ scale: 0.98 }}
-//           animate={{ 
-//             boxShadow: ["0 0 0px rgba(168, 85, 247, 0.3)", "0 0 10px rgba(168, 85, 247, 0.5)", "0 0 0px rgba(168, 85, 247, 0.3)"],
-//           }}
-//           transition={{ duration: 2, repeat: Infinity }}
-//         >
-//           <span className="animate-text-shimmer">{isOpen ? "CLOSE" : "MENU"}</span>
-//         </motion.button>
-//       </motion.div>
-
-//       <AnimatePresence>
-//         {isOpen && (
-//           <>
-//             <motion.div
-//               className="fixed inset-0 bg-dark-950/90 backdrop-blur-md z-[40]"
-//               initial={{ opacity: 0 }}
-//               animate={{ opacity: 1 }}
-//               exit={{ opacity: 0 }}
-//               transition={{ duration: 0.4 }}
-//               onClick={() => setIsOpen(false)}
-//             />
-
-//             <motion.div
-//               className="fixed top-8 right-8 w-[180px] h-[180px] md:w-[220px] md:h-[220px] rounded-full border border-primary-500 z-[50] shadow-glow-purple-lg"
-//               initial={{ opacity: 0, scale: 0 }}
-//               animate={{ opacity: 1, scale: 1 }}
-//               exit={{ opacity: 0, scale: 0 }}
-//               transition={{ duration: 0.5 }}
-//             >
-//               <div className="absolute inset-0 bg-[conic-gradient(from_0deg,_#a855f7_0deg,_#a855f7_10deg,_transparent_10deg,_transparent_72deg,_#a855f7_72deg,_#a855f7_82deg,_transparent_82deg)] opacity-40 rounded-full animate-spin-slow pointer-events-none" />
-              
-//               {menuItems.map((item) => {
-//                 const angleRad = (item.angle * Math.PI) / 180;
-//                 const x = radius * Math.cos(angleRad);
-//                 const y = radius * Math.sin(angleRad);
-
-//                 return (
-//                   <div
-//                     key={item.label}
-//                     className="absolute z-[60]"
-//                     style={{
-//                       left: `calc(50% + ${x}px - 25px)`,
-//                       top: `calc(50% - ${y}px - 25px)`,
-//                     }}
-//                   >
-//                     <motion.div 
-//                       className="relative w-[50px] h-[50px] rounded-full border border-[#6b21a8]/60 flex items-center justify-center"
-//                       onHoverStart={() => setHoveredItem(item.label)}
-//                       onHoverEnd={() => setHoveredItem(null)}
-//                     >
-//                       <motion.a
-//                         href={item.href}
-//                         className="w-[40px] h-[40px] rounded-full bg-gradient-to-br from-purple-900/80 via-indigo-900/80 to-blue-900/80 border border-purple-500 text-white font-bold text-[10px] backdrop-blur-sm flex flex-col items-center justify-center cursor-pointer z-[70] interactive-glow"
-//                         whileHover={{ 
-//                           scale: 1.1, 
-//                           boxShadow: "0 0 15px rgba(168, 85, 247, 0.5)",
-//                         }}
-//                         whileTap={{ scale: 0.98 }}
-//                         animate={{ 
-//                           boxShadow: hoveredItem === item.label 
-//                             ? "0 0 20px rgba(168, 85, 247, 0.8)"
-//                             : ["0 0 0px rgba(168, 85, 247, 0.3)", "0 0 10px rgba(168, 85, 247, 0.5)", "0 0 0px rgba(168, 85, 247, 0.3)"],
-//                         }}
-//                         transition={{ duration: 2, repeat: Infinity }}
-//                         onClick={(e) => handleClick(item.href, e)}
-//                         tabIndex={isOpen ? 0 : -1}
-//                         aria-label={item.label}
-//                       >
-//                         <span className="text-base mb-0.5">{item.icon}</span>
-//                         <span className="animate-text-shimmer text-[10px]">{item.label}</span>
-//                       </motion.a>
-//                     </motion.div>
-//                   </div>
-//                 );
-//               })}
-//             </motion.div>
-//           </>
-//         )}
-//       </AnimatePresence>
-//     </div>
-//   );
-// };
-
-// function FullScreenCarousel() {
-//   const [current, setCurrent] = React.useState(0);
-
-//   React.useEffect(() => {
-//     const interval = setInterval(() => {
-//       setCurrent((c) => (c === projectImages.length - 1 ? 0 : c + 1));
-//     }, 4000);
-//     return () => clearInterval(interval);
-//   }, []);
-
-//   return (
-//     <section className="relative w-full h-screen flex items-center justify-center bg-[#1a1333] overflow-hidden">
-//       <div className="absolute inset-0 z-0">
-//         <div className="w-full h-full bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-20" />
-//       </div>
-      
-//       <RadialMenu />
-
-//       <img
-//         src={projectImages[current].src}
-//         alt={projectImages[current].alt}
-//         className="absolute inset-0 w-full h-full object-cover object-center transition-all duration-500 z-0"
-//         style={{ filter: "brightness(0.7)" }}
-//       />
-//       <div className="relative z-10 flex pt-40 md:pt-60 flex-col items-center justify-center w-full h-full px-4">
-//         <h3 className="text-xl sm:text-2xl md:text-4xl font-bold text-white drop-shadow mb-4 px-4 py-2 md:px-8 md:py-4 rounded-2xl text-center  bg-opacity-30">
-//           {projectImages[current].title}
-//         </h3>
-//         <div className="flex justify-center gap-2 mt-6">
-//           {projectImages.map((_, idx) => (
-//             <button
-//               key={idx}
-//               onClick={() => setCurrent(idx)}
-//               className={`w-3 h-3 md:w-4 md:h-4 rounded-full border border-purple-400 ${
-//                 idx === current ? "bg-purple-400" : "bg-purple-900"
-//               }`}
-//               aria-label={`Go to slide ${idx + 1}`}
-//             />
-//           ))}
-//         </div>
-//       </div>
-//       <div className="absolute inset-0 bg-gradient-to-t from-[#1a1333] via-transparent to-[#1a1333]/60 pointer-events-none" />
-//     </section>
-//   );
-// }
-
-// const AuthHero = () => {
-//   return (
-//     <div className="min-h-screen bg-gradient-to-br from-[#0d0b33] to-[#0b0e2e] text-white flex items-center px-4 sm:px-6 md:px-10 lg:px-20 py-16 md:py-0">
-//       <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-//         <div className="z-10 order-2 md:order-1">
-//           <p className="text-xs sm:text-sm text-purple-300 font-medium">
-//             The <span className="text-purple-500">future</span> of business technology
-//           </p>
-//           <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold leading-tight mt-4">
-//             Transform Your Business<br />
-//             <span className="text-purple-200">With Advanced AI Solutions</span>
-//           </h1>
-//           <ul className="text-gray-400 mt-4 text-sm sm:text-base">
-//             <li className="flex items-start mb-2">
-//               <span className="text-purple-400 mt-1 mr-2">•</span>
-//               IT training with guaranteed placements through industry-focused curriculum and hands-on learning.
-//             </li>
-//             <li className="flex items-start">
-//               <span className="text-purple-400 mt-1 mr-2">•</span>
-//               Smart performance tracking with question analysis, scoring, and improvement tips to boost interview readiness.
-//             </li>
-//           </ul>
-//         </div>
-
-//         <div className="relative flex justify-center items-center order-1 md:order-2">
-//           <div className="absolute w-[250px] h-[250px] sm:w-[300px] sm:h-[300px] md:w-[400px] md:h-[400px] rounded-full bg-purple-800 blur-3xl opacity-40"></div>
-//           <img
-//             src={lmsHero}
-//             alt="AI Solutions Platform"
-//             className="relative w-full max-w-[300px] sm:max-w-[400px] md:max-w-[500px] h-auto object-contain z-10"
-//           />
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// const Faster = () => {
-//     return (
-//       <section className="bg-[#0a1026] py-16 px-4 sm:px-6">
-//         <div className="max-w-6xl mx-auto">
-//           <h2 className="text-2xl sm:text-3xl md:text-5xl font-extrabold text-white text-center mb-4">
-//             Smarter Business Operations.
-//           </h2>
-//           <p className="text-zinc-400 text-center max-w-2xl mx-auto mb-12 text-sm sm:text-base md:text-lg">
-//           Our AI solutions deliver automation, data insights, and process optimization. They empower teams to make faster decisions, reduce manual effort, and drive measurable business growth.
-//           </p>
-  
-//           <div className="bg-[#11182b] border border-zinc-700 rounded-2xl shadow-xl flex flex-col md:flex-row items-center md:items-stretch overflow-hidden"
-//                style={{ minHeight: 400 }}>
-//             <div className="flex-1 flex flex-col justify-center p-6 sm:p-8 md:p-12">
-//               <h3 className="text-lg sm:text-xl md:text-2xl font-semibold text-white mb-3">
-//                 <span className="font-bold">Optimized for business transformation</span>
-//               </h3>
-//               <p className="text-zinc-400 mb-6 sm:mb-8 text-sm sm:text-base md:text-lg">
-//                 Our AI systems provide the most effective solutions for automating and optimizing your business processes.
-//               </p>
-//               <a
-//                 href="https://sklassics-ai.com/"
-//                 target="_blank"
-//                 rel="noopener noreferrer"
-//                 className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-zinc-600 text-white font-medium hover:bg-purple-700/20 transition text-sm w-auto"
-//               >
-//                 Visit SKlassic AI <span className="text-purple-400">&rarr;</span>
-//               </a>
-//             </div>
-//             <div className="flex-1 flex items-center justify-center relative min-h-[250px] bg-transparent">
-//               <img
-//                 src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1600&q=80"
-//                 alt="AI Solutions Visualization"
-//                 className="w-full max-w-[420px] h-auto object-contain mx-auto"
-//                 style={{ filter: "drop-shadow(0 0 60px #a78bfa66)" }}
-//               />
-//             </div>
-//           </div>
-//         </div>
-//       </section>
-//     );
-//   };
-  
-// const WhyTrustUs = () => {
-//   const features = [
-//     {
-//       category: 'Business Solutions',
-//       items: [
-//         { icon: <LucideMessageCircle size={18} />, title: 'Process Automation' },
-//         { icon: <LucideLayoutDashboard size={18} />, title: 'Data Analytics' },
-//         { icon: <LucideSearch size={18} />, title: 'AI-Powered Insights' },
-//       ],
-//     },
-//     {
-//       category: 'Enterprise Features',
-//       items: [
-//         { icon: <LucideBarChart2 size={18} />, title: 'Performance Metrics' },
-//         { icon: <LucideBell size={18} />, title: 'Real-time Alerts' },
-//         { icon: <LucideLink size={18} />, title: 'System Integration' },
-//       ],
-//     },
-//     {
-//       category: 'Quality Standards',
-//       items: [
-//         { icon: <LucideShield size={18} />, title: 'Enterprise Security' },
-//         { icon: <LucideDownload size={18} />, title: 'Data Export' },
-//         { icon: <LucideClock size={18} />, title: '24/7 Monitoring' },
-//       ],
-//     },
-//   ];
-
-//   return (
-//     <section className="bg-[#0E1321] text-white py-12 sm:py-16 px-4 sm:px-6 md:px-10 lg:px-16">
-//       <div className="max-w-7xl mx-auto">
-//         <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-white mb-4">
-//           <span className="bg-gradient-to-r from-purple-400 to-white bg-clip-text text-transparent">
-//             Why choose SKlassic AI?
-//           </span>
-//         </h2>
-//         <p className="text-gray-300 text-sm sm:text-base mb-8 sm:mb-12 max-w-3xl">
-//           We're redefining business technology with cutting-edge AI solutions, automation, and data analytics.
-//         </p>
-
-//         {features.map((group, i) => (
-//           <div key={i} className="mb-8 sm:mb-10">
-//             <h3 className="text-xs sm:text-sm text-purple-400 font-semibold mb-3 sm:mb-4">{group.category}</h3>
-//             <div className="grid gap-4 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3">
-//               {group.items.map((item, j) => (
-//                 <div key={j} className="flex items-start space-x-3">
-//                   <div className="text-purple-300 mt-0.5">{item.icon}</div>
-//                   <div>
-//                     <h4 className="text-white font-semibold text-base sm:text-lg mb-1">{item.title}</h4>
-//                     <p className="text-gray-400 text-xs sm:text-sm">
-//                       Our platform ensures the highest standards for your business operations.
-//                     </p>
-//                   </div>
-//                 </div>
-//               ))}
-//             </div>
-//           </div>
-//         ))}
-//       </div>
-//     </section>
-//   );
-// };
-
-// const FeatureCarousel = () => {
-//   const scrollRef = useRef(null);
-//   const cards = [
-//     {
-//       title: "Process Automation",
-//       desc: "Streamline operations with intelligent automation solutions.",
-//       icon: "🤖",
-//     },
-//     {
-//       title: "Data Analytics",
-//       desc: "Powerful insights from your business data in real-time.",
-//       icon: "📊",
-//     },
-//     {
-//       title: "AI Integration",
-//       desc: "Seamlessly integrate AI into your existing systems.",
-//       icon: "🧠",
-//     },
-//     {
-//       title: "Enterprise Security",
-//       desc: "Military-grade security for your sensitive data.",
-//       icon: "🔒",
-//     },
-//     {
-//       title: "Cloud Solutions",
-//       desc: "Scalable cloud-based infrastructure for any business size.",
-//       icon: "☁️",
-//     },
-//   ];
-
-//   const scroll = (direction) => {
-//     const scrollAmount = 300;
-//     if (scrollRef.current) {
-//       scrollRef.current.scrollBy({
-//         left: direction === "left" ? -scrollAmount : scrollAmount,
-//         behavior: "smooth",
-//       });
-//     }
-//   };
-
-//   return (
-//     <div className="bg-[#0a0c1b] text-white py-12 sm:py-16 px-4">
-//       <div className="text-center max-w-3xl mx-auto mb-8 sm:mb-10">
-//         <p className="text-xs sm:text-sm text-purple-400 font-medium">SKlassic AI Features</p>
-//         <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mt-2 mb-3 sm:mb-4">Your business transformation platform</h2>
-//         <p className="text-gray-400 text-sm sm:text-base">
-//           Experience the future of business operations with our comprehensive AI solutions.
-//         </p>
-//       </div>
-
-//       <div className="relative">
-//         <div
-//           ref={scrollRef}
-//           className="flex overflow-x-auto no-scrollbar scroll-smooth space-x-4 px-2"
-//         >
-//           {cards.map((card, index) => (
-//             <div
-//               key={index}
-//               className="min-w-[220px] sm:min-w-[250px] md:min-w-[280px] bg-[#101223] rounded-xl border border-[#1d2033] p-4 sm:p-5 hover:bg-gradient-to-br from-purple-800/20 to-transparent transition duration-300"
-//             >
-//               <div className="text-2xl mb-3">{card.icon}</div>
-//               <h3 className="text-base sm:text-lg font-semibold mb-2">{card.title}</h3>
-//               <p className="text-gray-400 text-xs sm:text-sm">{card.desc}</p>
-//             </div>
-//           ))}
-//         </div>
-
-//         <div className="flex justify-center gap-4 mt-6">
-//           <button
-//             onClick={() => scroll("left")}
-//             className="bg-[#1d2033] hover:bg-[#292d45] p-2 rounded-full text-white"
-//             aria-label="Scroll left"
-//           >
-//             <FaArrowLeft size={14} />
-//           </button>
-//           <button
-//             onClick={() => scroll("right")}
-//             className="bg-[#1d2033] hover:bg-[#292d45] p-2 rounded-full text-white"
-//             aria-label="Scroll right"
-//           >
-//             <FaArrowRight size={14} />
-//           </button>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// const AiInterviewDisplay = () => {
-//   return (
-//     <div className="bg-[#0a0a23] text-white">
-//       <FullScreenCarousel />
-//       <AuthHero />
-//       <Faster />
-//       <WhyTrustUs />
-//       <FeatureCarousel />
-//       <Footer />
-//     </div>
-//   );
-// };
-
-// export default AiInterviewDisplay;
-
-
-
-
-import React, { useEffect, useRef, useState } from "react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import lmsHero from "../../assets/lms.png"; 
-import { motion, AnimatePresence } from "framer-motion";
-import { FaArrowLeft, FaArrowRight } from 'react-icons/fa'; 
-import { 
-  LucideMessageCircle, 
-  LucideLayoutDashboard, 
-  LucideSearch,
-  LucideBarChart2,
-  LucideBell,
-  LucideLink,
-  LucideShield,
-  LucideDownload,
-  LucideClock
-} from 'lucide-react';
-import Footer from "../../animated-portfolio/Footer";
-
-// Register GSAP plugins
-gsap.registerPlugin(ScrollTrigger);
-
-const RadialMenu = () => {
-  const radius = 80;
-  const [isOpen, setIsOpen] = useState(false);
-  const [hoveredItem, setHoveredItem] = useState(null);
-
-  const handleClick = (href, e) => {
-    e.preventDefault();
-    setIsOpen(false);
-
-    setTimeout(() => {
-      const id = href.replace("#", "");
-      const el = document.getElementById(id);
-      if (el) {
-        const yOffset = -40;
-        const y = el.getBoundingClientRect().top + window.pageYOffset + yOffset;
-        window.scrollTo({ top: y, behavior: "smooth" });
-      }
-    }, 400);
-  };
-
-  const menuItems = [
-    { label: "Home", angle: 0, href: "#home", icon: "🏠" },
-    { label: "Features", angle: 90, href: "#features", icon: "✨" },
-    { label: "Solutions", angle: 180, href: "#solutions", icon: "🚀" },
-    { label: "Contact", angle: 270, href: "#contact", icon: "📞" },
-  ];
-
-  return (
-    <div className="fixed top-4 right-4 z-[100] text-white">
-      <motion.div
-        className="relative w-[50px] h-[50px] md:w-[60px] md:h-[60px] rounded-full border border-primary-800 flex items-center justify-center"
-        animate={{ rotate: [0, 360] }}
-        transition={{ repeat: Infinity, duration: 30, ease: "linear" }}
-      >
-        <motion.button
-          onClick={() => setIsOpen(!isOpen)}
-          className="w-[40px] h-[40px] md:w-[50px] md:h-[50px] rounded-full bg-gradient-to-br from-purple-900/80 via-indigo-900/80 to-blue-900/80 border border-purple-500 text-[10px] md:text-xs font-bold backdrop-blur-sm flex items-center justify-center text-white interactive-glow"
-          whileHover={{ 
-            scale: 1.05, 
-            boxShadow: "0 0 15px rgba(168, 85, 247, 0.5)",
-          }}
-          whileTap={{ scale: 0.98 }}
-          animate={{ 
-            boxShadow: ["0 0 0px rgba(168, 85, 247, 0.3)", "0 0 10px rgba(168, 85, 247, 0.5)", "0 0 0px rgba(168, 85, 247, 0.3)"],
-          }}
-          transition={{ duration: 2, repeat: Infinity }}
-        >
-          <span className="animate-text-shimmer">{isOpen ? "CLOSE" : "MENU"}</span>
-        </motion.button>
-      </motion.div>
-
-      <AnimatePresence>
-        {isOpen && (
-          <>
-            <motion.div
-              className="fixed inset-0 bg-dark-950/90 backdrop-blur-md z-[40]"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.4 }}
-              onClick={() => setIsOpen(false)}
-            />
-
-            <motion.div
-              className="fixed top-8 right-8 w-[180px] h-[180px] md:w-[220px] md:h-[220px] rounded-full border border-primary-500 z-[50] shadow-glow-purple-lg"
-              initial={{ opacity: 0, scale: 0 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0 }}
-              transition={{ duration: 0.5 }}
-            >
-              <div className="absolute inset-0 bg-[conic-gradient(from_0deg,_#a855f7_0deg,_#a855f7_10deg,_transparent_10deg,_transparent_72deg,_#a855f7_72deg,_#a855f7_82deg,_transparent_82deg)] opacity-40 rounded-full animate-spin-slow pointer-events-none" />
-              
-              {menuItems.map((item) => {
-                const angleRad = (item.angle * Math.PI) / 180;
-                const x = radius * Math.cos(angleRad);
-                const y = radius * Math.sin(angleRad);
-
-                return (
-                  <div
-                    key={item.label}
-                    className="absolute z-[60]"
-                    style={{
-                      left: `calc(50% + ${x}px - 25px)`,
-                      top: `calc(50% - ${y}px - 25px)`,
-                    }}
-                  >
-                    <motion.div 
-                      className="relative w-[50px] h-[50px] rounded-full border border-[#6b21a8]/60 flex items-center justify-center"
-                      onHoverStart={() => setHoveredItem(item.label)}
-                      onHoverEnd={() => setHoveredItem(null)}
-                    >
-                      <motion.a
-                        href={item.href}
-                        className="w-[40px] h-[40px] rounded-full bg-gradient-to-br from-purple-900/80 via-indigo-900/80 to-blue-900/80 border border-purple-500 text-white font-bold text-[10px] backdrop-blur-sm flex flex-col items-center justify-center cursor-pointer z-[70] interactive-glow"
-                        whileHover={{ 
-                          scale: 1.1, 
-                          boxShadow: "0 0 15px rgba(168, 85, 247, 0.5)",
-                        }}
-                        whileTap={{ scale: 0.98 }}
-                        animate={{ 
-                          boxShadow: hoveredItem === item.label 
-                            ? "0 0 20px rgba(168, 85, 247, 0.8)"
-                            : ["0 0 0px rgba(168, 85, 247, 0.3)", "0 0 10px rgba(168, 85, 247, 0.5)", "0 0 0px rgba(168, 85, 247, 0.3)"],
-                        }}
-                        transition={{ duration: 2, repeat: Infinity }}
-                        onClick={(e) => handleClick(item.href, e)}
-                        tabIndex={isOpen ? 0 : -1}
-                        aria-label={item.label}
-                      >
-                        <span className="text-base mb-0.5">{item.icon}</span>
-                        <span className="animate-text-shimmer text-[10px]">{item.label}</span>
-                      </motion.a>
-                    </motion.div>
-                  </div>
-                );
-              })}
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
-    </div>
-  );
-};
-
-
-
-const CubeGallery = () => {
-  const cubeRef = useRef(null);
-  const containerRef = useRef(null);
+/* ---------- Component ---------- */
+export default function ProjectViewNew() {
   const heroRef = useRef(null);
-  const parallaxRef = useRef(null);
-  
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [currentAngleY, setCurrentAngleY] = useState(0);
-  const [draggedImages, setDraggedImages] = useState([]);
-  const [autoRotate, setAutoRotate] = useState(true);
+  const barRef = useRef(null);
 
-  const rotateCubeLeft = () => {
-    setCurrentAngleY(prev => prev + 90);
-    if (cubeRef.current) {
-      gsap.to(cubeRef.current, {
-        rotationY: `+=90`,
-        duration: 1,
-        ease: "power3.inOut",
-        onUpdate: () => {
-          if (cubeRef.current) {
-            cubeRef.current.style.transform = `rotateY(${currentAngleY + 90}deg)`;
-          }
-        }
-      });
-    }
-  };
-  
-  const rotateCubeRight = () => {
-    setCurrentAngleY(prev => prev - 90);
-    if (cubeRef.current) {
-      gsap.to(cubeRef.current, {
-        rotationY: `-=90`,
-        duration: 1,
-        ease: "power3.inOut",
-        onUpdate: () => {
-          if (cubeRef.current) {
-            cubeRef.current.style.transform = `rotateY(${currentAngleY - 90}deg)`;
-          }
-        }
-      });
-    }
-  };
+  /* Carousel refs */
+  const trackRef = useRef(null);
+  const cardRefs = useRef([]);
+  const [menuOpen, setMenuOpen] = useState(false);
 
-  const screenData = [
-    { 
-      title: "Dashboard Interface", 
-      desc: "A sleek dashboard for real-time data visualization and analytics.",
-      img: "https://media.gettyimages.com/id/2193247029/photo/business-team-analyzing-interactive-digital-dashboards-with-data-visualizations.jpg?s=612x612&w=gi&k=20&c=_NuN-BOUpDJFteOsPMsjJotFwzYAyqbe8uvfT7anT2M="
-    },
-    { 
-      title: "Analytics Module", 
-      desc: "Interactive charts and deep insights for data-driven decisions.",
-      img: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&h=400&fit=crop"
-    },
-    { 
-      title: "Settings Panel", 
-      desc: "Customizable settings panel with advanced configuration options.",
-      img: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&h=400&fit=crop"
-    },
-    { 
-      title: "Collaboration Hub", 
-      desc: "Real-time team collaboration tools and communication platform.",
-      img: "https://images.unsplash.com/photo-1552664730-d307ca884978?w=600&h=400&fit=crop"
-    },
-    { 
-      title: "Task Manager", 
-      desc: "Streamlined task tracking and project management interface.",
-      img: "https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=600&h=400&fit=crop"
-    },
-    { 
-      title: "Reports Generator", 
-      desc: "Automated report creation and comprehensive data export tools.",
-      img: "https://images.unsplash.com/photo-1543286386-713bdd548da4?w=600&h=400&fit=crop"
-    }
-  ];
 
-  // Auto-rotation functionality - only horizontal
+  const [heroIndex, setHeroIndex] = useState(0);
+  const [hoverHero, setHoverHero] = useState(false);
+  const [lightbox, setLightbox] = useState({ open: false, i: 0 });
+
+  const [cat, setCat] = useState("All");
+  const [query, setQuery] = useState("");
+  const [sortBy, setSortBy] = useState("title-asc");
+  const [compact, setCompact] = useState(false);
+
+  /* Viewport mode: auto/desktop/mobile for easy preview */
+  const [viewport, setViewport] = useState("auto"); // 'auto' | 'desktop' | 'mobile'
+  const [vw, setVw] = useState(typeof window !== 'undefined' ? window.innerWidth : 1280);
   useEffect(() => {
-    if (!autoRotate) return;
+    const onResize = () => setVw(window.innerWidth);
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+  const effectiveMode = useMemo(() => {
+    if (viewport === 'desktop') return 'desktop';
+    if (viewport === 'mobile') return 'mobile';
+    return vw <= 640 ? 'mobile' : 'desktop';
+  }, [viewport, vw]);
 
-    const interval = setInterval(() => {
-      nextScreen();
-    }, 4000); // Auto rotate every 4 seconds
+  /* Filters + search + sort */
+  const catFiltered = useMemo(() => (cat === "All" ? IMGS : IMGS.filter(i => i.cat === cat)), [cat]);
+  const textFiltered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return catFiltered;
+    return catFiltered.filter(i => (i.title + " " + i.desc + " " + i.cat).toLowerCase().includes(q));
+  }, [query, catFiltered]);
+  const finalList = useMemo(() => {
+    const list = [...textFiltered];
+    if (sortBy === "title-asc") list.sort((a, b) => a.title.localeCompare(b.title));
+    if (sortBy === "title-desc") list.sort((a, b) => b.title.localeCompare(a.title));
+    return list;
+  }, [textFiltered, sortBy]);
 
-    return () => clearInterval(interval);
-  }, [autoRotate, currentAngleY, currentIndex]);
+  /* ---------- TOP CAROUSEL logic ---------- */
+  const [carIdx, setCarIdx] = useState(0);
+  const [carHover, setCarHover] = useState(false);
+  const [carExpanded, setCarExpanded] = useState(false);
 
-  // Handle drag start
-  const handleDragStart = (e, imageData, faceIndex) => {
-    e.dataTransfer.setData('application/json', JSON.stringify({
-      ...imageData,
-      faceIndex
-    }));
+  const scrollToIdx = (i) => {
+    const track = trackRef.current; const card = cardRefs.current[i];
+    if (!track || !card) return;
+    const left = card.offsetLeft - (track.clientWidth/2 - card.clientWidth/2);
+    track.scrollTo({ left, behavior: 'smooth' });
   };
+  const nextCar = () => setCarIdx(i => (i + 1) % IMGS.length);
+  const prevCar = () => setCarIdx(i => (i - 1 + IMGS.length) % IMGS.length);
 
-  // Handle drop outside cube
-  const handleDrop = (e) => {
-    e.preventDefault();
-    try {
-      const data = JSON.parse(e.dataTransfer.getData('application/json'));
-      const rect = containerRef.current?.getBoundingClientRect();
-      
-      if (rect) {
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        
-        const newDraggedImage = {
-          id: `dropped-${Date.now()}-${Math.random()}`,
-          x,
-          y,
-          img: data.img,
-          title: data.title
-        };
-        
-        setDraggedImages(prev => [...prev, newDraggedImage]);
-      }
-    } catch (error) {
-      console.error('Error handling drop:', error);
-    }
-  };
-
-  const handleDragOver = (e) => {
-    e.preventDefault();
-  };
-
-  // Navigation functions - only horizontal rotation
-  const nextScreen = () => {
-    setCurrentAngleY(prev => prev - 90);
-    setCurrentIndex(prev => (prev + 1) % screenData.length);
-    
-    if (cubeRef.current) {
-      gsap.to(cubeRef.current, {
-        rotationY: currentAngleY - 90,
-        duration: 1,
-        ease: "power3.inOut",
-      });
-    }
-  };
-
-  const prevScreen = () => {
-    setCurrentAngleY(prev => prev + 90);
-    setCurrentIndex(prev => (prev - 1 + screenData.length) % screenData.length);
-    
-    if (cubeRef.current) {
-      gsap.to(cubeRef.current, {
-        rotationY: currentAngleY + 90,
-        duration: 1,
-        ease: "power3.inOut",
-      });
-    }
-  };
-
-  const toggleAutoRotate = () => {
-    setAutoRotate(!autoRotate);
-  };
-
-  const removeDraggedImage = (id) => {
-    setDraggedImages(prev => prev.filter(img => img.id !== id));
-  };
-// In the CubeGallery component, update the useEffect with animations:
-
-useEffect(() => {
-  // Only run animations if elements exist
-  if (!parallaxRef.current || !heroRef.current) return;
-
-  // Hero section animations with null checks
-  const heroTl = gsap.timeline();
-  
-  if (parallaxRef.current) {
-    heroTl.from(parallaxRef.current, { 
-      scale: 1.3, 
-      opacity: 0, 
-      duration: 2.5, 
-      ease: "power4.out" 
-    });
-  }
-
-  const heroTitle = document.querySelector(".hero-title");
-  if (heroTitle) {
-    heroTl.from(heroTitle, { 
-      y: 120, 
-      opacity: 0, 
-      duration: 1.5, 
-      ease: "power4.out" 
-    }, "-=2");
-  }
-
-  const heroSubtitle = document.querySelector(".hero-subtitle");
-  if (heroSubtitle) {
-    heroTl.from(heroSubtitle, { 
-      y: 100, 
-      opacity: 0, 
-      duration: 1.2, 
-      ease: "power4.out" 
-    }, "-=1");
-  }
-
-  const heroButton = document.querySelector(".hero-button");
-  if (heroButton) {
-    heroTl.from(heroButton, { 
-      y: 80, 
-      opacity: 0, 
-      duration: 1, 
-      ease: "elastic.out(1, 0.5)" 
-    }, "-=0.8");
-  }
-
-  // Parallax effect with null check
-  if (parallaxRef.current && heroRef.current) {
-    gsap.to(parallaxRef.current, {
-      yPercent: 25,
-      ease: "none",
-      scrollTrigger: {
-        trigger: heroRef.current,
-        start: "top top",
-        end: "bottom top",
-        scrub: true
-      }
-    });
-  }
-
-  // Cube section animations with null checks
-  const screensSection = document.querySelector("#screens");
-  if (screensSection) {
-    const cubeTl = gsap.timeline({
-      scrollTrigger: {
-        trigger: "#screens",
-        start: "top 80%",
-        toggleActions: "play none none none"
-      }
-    });
-
-    const cubeContainer = document.querySelector(".cube-container");
-    if (cubeContainer) {
-      cubeTl.from(cubeContainer, { 
-        y: 150, 
-        opacity: 0, 
-        duration: 1.5, 
-        ease: "power3.out" 
-      });
-    }
-
-    const cubeFaces = document.querySelectorAll(".cube-face");
-    if (cubeFaces.length > 0) {
-      cubeTl.from(cubeFaces, { 
-        scale: 0.8, 
-        opacity: 0, 
-        rotationX: 45, 
-        stagger: 0.1, 
-        duration: 1.2, 
-        ease: "power3.out" 
-      }, "-=1");
-    }
-
-    const navButtons = document.querySelectorAll(".nav-button");
-    if (navButtons.length > 0) {
-      cubeTl.from(navButtons, { 
-        y: 50, 
-        opacity: 0, 
-        stagger: 0.2, 
-        duration: 0.8, 
-        ease: "power2.out" 
-      }, "-=0.5");
-    }
-
-    const screenInfo = document.querySelector(".screen-info");
-    if (screenInfo) {
-      cubeTl.from(screenInfo, { 
-        y: 50, 
-        opacity: 0, 
-        duration: 1, 
-        ease: "power3.out" 
-      }, "-=0.3");
-    }
-  }
-
-  // About section animations with null checks
-  const aboutSection = document.querySelector("#about");
-  if (aboutSection) {
-    const aboutTl = gsap.timeline({
-      scrollTrigger: {
-        trigger: "#about",
-        start: "top 80%",
-        toggleActions: "play none none none"
-      }
-    });
-
-    const aboutTitle = document.querySelector(".about-title");
-    if (aboutTitle) {
-      aboutTl.from(aboutTitle, { 
-        y: 60, 
-        opacity: 0, 
-        duration: 1.2, 
-        ease: "power4.out" 
-      });
-    }
-
-    const aboutTexts = document.querySelectorAll(".about-text");
-    if (aboutTexts.length > 0) {
-      aboutTl.from(aboutTexts, { 
-        x: -120, 
-        opacity: 0, 
-        duration: 1, 
-        stagger: 0.3, 
-        ease: "power3.out" 
-      }, "-=0.8");
-    }
-
-    const aboutButton = document.querySelector(".about-button");
-    if (aboutButton) {
-      aboutTl.from(aboutButton, { 
-        scale: 0.7, 
-        opacity: 0, 
-        duration: 1, 
-        ease: "elastic.out(1, 0.5)" 
-      }, "-=0.5");
-    }
-  }
-
-  return () => {
-    ScrollTrigger.getAll().forEach(trigger => trigger.kill());
-  };
-}, []); // Empty dependency array ensures this runs once after mount
-
-  // Update cube rotation
+  useEffect(() => { scrollToIdx(carIdx); }, [carIdx]);
   useEffect(() => {
-    if (cubeRef.current) {
-      cubeRef.current.style.transform = `rotateY(${currentAngleY}deg)`;
+    if (carHover) return; // pause on hover
+    const id = setInterval(() => setCarIdx(i => (i + 1) % IMGS.length), 4200);
+    return () => clearInterval(id);
+  }, [carHover]);
+
+  /* Hero autoplay + progress (pure React timer) */
+  useEffect(() => {
+    const slides = heroRef.current?.querySelectorAll?.(".slide");
+    if (!slides || !slides.length) return;
+
+    slides.forEach((s, i) => (s.style.opacity = i === heroIndex ? "1" : "0"));
+    if (barRef.current) barRef.current.style.width = "0";
+
+    const start = Date.now();
+    const DURATION = 3300;
+
+    let raf;
+    const tick = () => {
+      const elapsed = hoverHero ? 0 : Date.now() - start;
+      const pct = Math.min(1, elapsed / DURATION);
+      if (barRef.current) barRef.current.style.width = `${pct * 100}%`;
+      if (pct >= 1) {
+        const next = (heroIndex + 1) % IMGS.length;
+        setHeroIndex(next);
+      } else {
+        raf = requestAnimationFrame(tick);
+      }
+    };
+    raf = requestAnimationFrame(tick);
+
+    return () => cancelAnimationFrame(raf);
+  }, [heroIndex, hoverHero]);
+
+  /* Lightbox keyboard */
+  useEffect(() => {
+    const onKey = (e) => {
+      if (!lightbox.open) return;
+      if (e.key === "Escape") setLightbox({ open: false, i: 0 });
+      if (e.key === "ArrowRight") setLightbox(s => ({ open: true, i: (s.i + 1) % IMGS.length }));
+      if (e.key === "ArrowLeft") setLightbox(s => ({ open: true, i: (s.i - 1 + IMGS.length) % IMGS.length }));
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [lightbox.open]);
+
+  /* Touch swipe on hero for mobile */
+  const touchRefState = useRef({ x: 0, t: 0 });
+  const onTouchStart = (e) => { const t = e.touches[0]; touchRefState.current = { x: t.clientX, t: Date.now() }; };
+  const onTouchEnd = (e) => {
+    const dx = (e.changedTouches[0]?.clientX || 0) - touchRefState.current.x;
+    const dt = Date.now() - touchRefState.current.t;
+    if (dt < 450 && Math.abs(dx) > 40) {
+      if (dx < 0) setHeroIndex((i) => (i + 1) % IMGS.length);
+      else setHeroIndex((i) => (i - 1 + IMGS.length) % IMGS.length);
     }
-  }, [currentAngleY]);
+  };
+
+  const setHero = (i) => setHeroIndex(i);
+  const openLB = (i) => setLightbox({ open: true, i });
+  const closeLB = () => setLightbox({ open: false, i: 0 });
+  const nextLB = () => setLightbox(s => ({ open: true, i: (s.i + 1) % IMGS.length }));
+  const prevLB = () => setLightbox(s => ({ open: true, i: (s.i - 1 + IMGS.length) % IMGS.length }));
+
+  const countLabel = `${finalList.length} item${finalList.length === 1 ? "" : "s"}`;
+
+  const go = (id) => (e) => { e?.preventDefault?.(); document.querySelector(id)?.scrollIntoView({ behavior:'smooth', block:'start' }); };
+
+  // Derived featured slice
+  const featured = finalList.slice(0, 4);
+
+  /* Intro reveal (IntersectionObserver) */
+  const introRef = useRef(null);
+  const toolbarRef = useRef(null);
+  const [introIn, setIntroIn] = useState(false);
+  const [toolbarIn, setToolbarIn] = useState(false);
+  useEffect(()=>{
+    const opts = { threshold: 0.3 };
+    const introObs = new IntersectionObserver(([e])=> setIntroIn(!!e.isIntersecting), opts);
+    const tbObs = new IntersectionObserver(([e])=> setToolbarIn(!!e.isIntersecting), opts);
+    if (introRef.current) introObs.observe(introRef.current);
+    if (toolbarRef.current) tbObs.observe(toolbarRef.current);
+    return ()=>{ introObs.disconnect(); tbObs.disconnect(); };
+  },[]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0d0b33] to-[#0b0e2e] text-white overflow-x-hidden">
-      <RadialMenu />
+    <div className="wrap">
+      <style dangerouslySetInnerHTML={{ __html: styles }} />
+      <div className={`panel ${effectiveMode === 'mobile' ? 'mobile' : 'desktop'}`}>
+        {/* Topbar */}
+        {/* Topbar */}
+        {/* Topbar */}
+<div className="topbar" role="navigation" aria-label="Primary">
+  <div className="tb-inner">
+    <div className="brand">
+      <div className="logo" aria-hidden="true" />
+      <h1>Showcase Home</h1>
+    </div>
+    {/* Desktop/Tablet Nav */}
+    <div className="navlinks desktop-nav">
+      <button className="alink" onClick={go('#about')}>About</button>
+      <button className="alink" onClick={go('#carousel')}>Carousel</button>
+      <button className="alink" onClick={go('#sections')}>Sections</button>
+      <button className="alink" onClick={go('#hero')}>Hero</button>
+      <button className="alink" onClick={go('#featured')}>Featured</button>
+      <button className="alink" onClick={go('#gallery')}>Gallery</button>
+    </div>
+    {/* Mobile Nav */}
+    <div className="mobile-nav">
+      <button className="hamburger" onClick={()=>setMenuOpen(true)} aria-label="Open menu">☰</button>
+    </div>
+  </div>
+  {/* Mobile Drawer Menu */}
+  <div className={`mobile-menu${menuOpen ? " open" : ""}`}>
+  
+  {/* Pills menu as vertical */}
+  <div className="mobile-pill-vertical">
+    <button className="pill-link" onClick={go('#about')}>About</button>
+    <button className="pill-link" onClick={go('#carousel')}>Carousel</button>
+    <button className="pill-link" onClick={go('#sections')}>Sections</button>
+    <button className="pill-link" onClick={go('#hero')}>Hero</button>
+    <button className="pill-link" onClick={go('#featured')}>Featured</button>
+    <button className="pill-link" onClick={go('#gallery')}>Gallery</button>
+  </div>
+  {/* Other drawer items here (WhatsApp, Login, etc) */}
+</div>
 
-      {/* Screens Section (3D Cube Gallery) */}
-      <section id="screens" className="py-20 relative">
-        <div className="container mx-auto px-4">
-          <h2 className="text-2xl sm:text-5xl font-extrabold text-white text-center  mb-12 bg-gradient-to-r from-red-400 via-teal-400 to-blue-400 bg-clip-text text-transparent">
-            Project Screens
-          </h2>
-          
-          <div 
-            ref={containerRef}
-            className="cube-container flex justify-center items-center relative"
-            style={{ perspective: '1500px', height: '500px' }}
-            onDrop={handleDrop}
-            onDragOver={handleDragOver}
-          >
-            <div 
-              ref={cubeRef}
-              className="cube relative"
-              style={{
-                width: '440px',
-                height: '300px',
-                transformStyle: 'preserve-3d',
-                transition: 'transform 1s ease'
-              }}
-            >
-              {/* Front Face */}
-              <div className="cube-face absolute w-full h-full bg-gradient-to-br from-[#0d0b33] to-[#0b0e2e] border-2 border-teal-400 overflow-hidden shadow-2xl"
-                   style={{ transform: 'rotateY(0deg) translateZ(200px)' }}>
-                <img 
-                  src={screenData[0].img} 
-                  alt={screenData[0].title} 
-                  className="w-full h-full object-cover transition-transform duration-500 hover:scale-110 cursor-grab active:cursor-grabbing" 
-                  draggable
-                  onDragStart={(e) => handleDragStart(e, screenData[0], 0)}
-                />
-              </div>
-              
-              {/* Right Face */}
-              <div className="cube-face absolute w-full h-full bg-gradient-to-br from-[#1a1661] to-[#0b0e2e] border-2 border-teal-400 overflow-hidden shadow-2xl"
-                   style={{ transform: 'rotateY(90deg) translateZ(200px)' }}>
-                <img 
-                  src={screenData[1].img} 
-                  alt={screenData[1].title} 
-                  className="w-full h-full object-cover transition-transform duration-500 hover:scale-110 cursor-grab active:cursor-grabbing" 
-                  draggable
-                  onDragStart={(e) => handleDragStart(e, screenData[1], 1)}
-                />
-              </div>
-              
-              {/* Back Face */}
-              <div className="cube-face absolute w-full h-full bg-gray-800 border-2 border-teal-400 overflow-hidden shadow-2xl"
-                   style={{ transform: 'rotateY(180deg) translateZ(200px)' }}>
-                <img 
-                  src={screenData[2].img} 
-                  alt={screenData[2].title} 
-                  className="w-full h-full object-cover transition-transform duration-500 hover:scale-110 cursor-grab active:cursor-grabbing" 
-                  draggable
-                  onDragStart={(e) => handleDragStart(e, screenData[2], 2)}
-                />
-              </div>
-              
-              {/* Left Face */}
-              <div className="cube-face absolute w-full h-full bg-gray-800 border-2 border-teal-400 overflow-hidden shadow-2xl"
-                   style={{ transform: 'rotateY(-90deg) translateZ(200px)' }}>
-                <img 
-                  src={screenData[3].img} 
-                  alt={screenData[3].title} 
-                  className="w-full h-full object-cover transition-transform duration-500 hover:scale-110 cursor-grab active:cursor-grabbing" 
-                  draggable
-                  onDragStart={(e) => handleDragStart(e, screenData[3], 3)}
-                />
-              </div>
-              
-              {/* Top Face */}
-              <div className="cube-face absolute w-full h-full bg-gray-800 border-2 border-teal-400 overflow-hidden shadow-2xl"
-                   style={{ transform: 'rotateX(90deg) translateZ(200px)' }}>
-                <img 
-                  src={screenData[4].img} 
-                  alt={screenData[4].title} 
-                  className="w-full h-full object-cover transition-transform duration-500 hover:scale-110 cursor-grab active:cursor-grabbing" 
-                  draggable
-                  onDragStart={(e) => handleDragStart(e, screenData[4], 4)}
-                />
-              </div>
-              
-              {/* Bottom Face */}
-              <div className="cube-face absolute w-full h-full bg-gray-800 border-2 border-teal-400 overflow-hidden shadow-2xl"
-                   style={{ transform: 'rotateX(-90deg) translateZ(200px)' }}>
-                <img 
-                  src={screenData[5].img} 
-                  alt={screenData[5].title} 
-                  className="w-full h-full object-cover transition-transform duration-500 hover:scale-110 cursor-grab active:cursor-grabbing" 
-                  draggable
-                  onDragStart={(e) => handleDragStart(e, screenData[5], 5)}
-                />
-              </div>
-            </div>
-            
-            {/* Dragged Images - Larger Size */}
-            {draggedImages.map((img) => (
-              <div
-                key={img.id}
-                className="absolute w-48 h-36 border-2 border-yellow-400 rounded-lg overflow-hidden shadow-2xl cursor-pointer hover:scale-105 transition-transform"
-                style={{ left: img.x - 96, top: img.y - 72 }}
-                onClick={() => removeDraggedImage(img.id)}
-                title={`${img.title} - Click to remove`}
-              >
-                <img 
-                  src={img.img} 
-                  alt={img.title} 
-                  className="w-full h-full object-cover" 
-                />
-                <div className="absolute top-1 right-1 bg-red-500 text-white text-sm px-2 py-1 rounded-full font-bold hover:bg-red-600">×</div>
-                <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-70 text-white text-xs p-1 text-center">
-                  {img.title}
+  {menuOpen && <div className="drawer-overlay" onClick={()=>setMenuOpen(false)} />}
+</div>
+
+
+        {/* Header / lead */}
+        <div className="header header-grid" id="about">
+          <div className={`intro ${introIn ? 'in' : ''}`} ref={introRef}>
+            <h2 className="title">
+              {/* <span className="pip" /> */}
+              <span className="ink">Welcome to your project home</span>
+            </h2>
+            <p className="lead lead-rail">
+              A single-screen hub that blends a <span className="hl">cinematic hero</span>, <span className="hl">rich descriptions</span>,
+              <span className="hl"> quick actions</span>, and <span className="hl">categorized sections</span>. Use the chips to filter,
+              the search to find anything fast, and the lightbox to view details. Toggle the <strong>viewport</strong> to preview
+              desktop/mobile instantly.
+            </p>
+          </div>
+
+        </div>
+        <hr className="divider" />
+
+        {/* ---------- TOP CAROUSEL ---------- */}
+       
+
+        {/* Quick status */}
+        <div className="section">
+          <div className="section-h"><h3>Overview</h3><span className="hint">System health & activity</span></div>
+          <div className="stats" role="list">
+            <div className="stat" role="listitem"><h4>Uptime</h4><p className="ok">99.98%</p></div>
+            <div className="stat" role="listitem"><h4>Active Users</h4><p>1,248</p></div>
+            <div className="stat" role="listitem"><h4>Open Tasks</h4><p className="warn">37</p></div>
+            <div className="stat" role="listitem"><h4>Incidents</h4><p className="bad">2</p></div>
+          </div>
+        </div>
+
+        {/* Sections directory */}
+        <div className="section" id="sections">
+          <div className="section-h"><h3>Sections</h3><span className="hint">Jump into a focused space</span></div>
+          <div className="sections">
+            {SECTIONS.map((s)=> (
+              <div key={s.key} className="section-card">
+                <h4>{s.icon} {s.title}</h4>
+                <p>{s.blurb}</p>
+                <div className="act">
+                  <button className="btn" onClick={()=>{ setCat(s.key); document.querySelector('#gallery')?.scrollIntoView({behavior:'smooth'}); }}>
+                    View {s.title}
+                  </button>
                 </div>
               </div>
             ))}
           </div>
-          
-          {/* Navigation Buttons - Outside of cube */}
-          <div className="flex justify-center gap-6 mb-8">
-            <button 
-              onClick={prevScreen}
-              className="font-bold px-4 py-2 rounded bg-blue-500 text-white hover:bg-blue-600"
-            >
-              ← Previous
-            </button>
-
-            <button 
-              onClick={toggleAutoRotate}
-              className={`font-bold px-4 py-2 rounded text-white ${
-                autoRotate ? 'bg-red-500 hover:bg-red-600' : 'bg-green-500 hover:bg-green-600'
-              }`}
-            >
-              {autoRotate ? 'Auto ON' : 'Auto OFF'}
-            </button>
-
-            <button 
-              onClick={nextScreen}
-              className="font-bold px-4 py-2 rounded bg-purple-500 text-white hover:bg-purple-600"
-            >
-              Next →
-            </button>
-          </div>
-          
-          <div className="screen-info text-center mt-8 text-gray-300">
-            <h3 className="text-2xl font-semibold mb-3">{screenData[currentIndex].title}</h3>
-            <p className="max-w-lg mx-auto text-lg leading-relaxed">{screenData[currentIndex].desc}</p>
-            {draggedImages.length > 0 && (
-              <div className="mt-4 p-3 bg-yellow-900 bg-opacity-30 rounded-lg inline-block">
-                <p className="text-sm text-yellow-300">
-                  📸 {draggedImages.length} screenshot(s) dropped. Click on them to remove.
-                </p>
-              </div>
-            )}
-            {/* <div className="mt-4 text-sm text-gray-400">
-              Auto-rotate: {autoRotate ? 'ON (4s intervals)' : 'OFF'} | Current: {currentIndex + 1}/{screenData.length}
-            </div> */}
-          </div>
-        </div>
-      </section>
-    </div>
-  );
-};
-
-// const CubeGallery = () => {
-//   const cubeRef = useRef(null);
-//   const containerRef = useRef(null);
-//   const [currentIndex, setCurrentIndex] = useState(0);
-//   const [currentAngleY, setCurrentAngleY] = useState(0);
-//   const [draggedImages, setDraggedImages] = useState([]);
-//   const [autoRotate, setAutoRotate] = useState(true);
-
-//   const screenData = [
-//     { 
-//       title: "Dashboard Interface", 
-//       desc: "A sleek dashboard for real-time data visualization and analytics.",
-//       img: "https://media.gettyimages.com/id/2193247029/photo/business-team-analyzing-interactive-digital-dashboards-with-data-visualizations.jpg?s=612x612&w=gi&k=20&c=_NuN-BOUpDJFteOsPMsjJotFwzYAyqbe8uvfT7anT2M="
-//     },
-//     { 
-//       title: "Analytics Module", 
-//       desc: "Interactive charts and deep insights for data-driven decisions.",
-//       img: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&h=400&fit=crop"
-//     },
-//     { 
-//       title: "Settings Panel", 
-//       desc: "Customizable settings panel with advanced configuration options.",
-//       img: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&h=400&fit=crop"
-//     },
-//     { 
-//       title: "Collaboration Hub", 
-//       desc: "Real-time team collaboration tools and communication platform.",
-//       img: "https://images.unsplash.com/photo-1552664730-d307ca884978?w=600&h=400&fit=crop"
-//     }
-//   ];
-
-//   const handleDragStart = (e, imageData, faceIndex) => {
-//     e.dataTransfer.setData('application/json', JSON.stringify({
-//       ...imageData,
-//       faceIndex
-//     }));
-//   };
-
-//   const handleDrop = (e) => {
-//     e.preventDefault();
-//     try {
-//       const data = JSON.parse(e.dataTransfer.getData('application/json'));
-//       const rect = containerRef.current?.getBoundingClientRect();
-      
-//       if (rect) {
-//         const x = e.clientX - rect.left;
-//         const y = e.clientY - rect.top;
-        
-//         const newDraggedImage = {
-//           id: `dropped-${Date.now()}-${Math.random()}`,
-//           x,
-//           y,
-//           img: data.img,
-//           title: data.title
-//         };
-        
-//         setDraggedImages(prev => [...prev, newDraggedImage]);
-//       }
-//     } catch (error) {
-//       console.error('Error handling drop:', error);
-//     }
-//   };
-
-//   const handleDragOver = (e) => {
-//     e.preventDefault();
-//   };
-
-//   const nextScreen = () => {
-//     setCurrentAngleY(prev => prev - 90);
-//     setCurrentIndex(prev => (prev + 1) % screenData.length);
-    
-//     if (cubeRef.current) {
-//       gsap.to(cubeRef.current, {
-//         rotationY: `+=90`,
-//         duration: 1,
-//         ease: "power3.inOut",
-//       });
-//     }
-//   };
-
-//   const prevScreen = () => {
-//     setCurrentAngleY(prev => prev + 90);
-//     setCurrentIndex(prev => (prev - 1 + screenData.length) % screenData.length);
-    
-//     if (cubeRef.current) {
-//       gsap.to(cubeRef.current, {
-//         rotationY: `-=90`,
-//         duration: 1,
-//         ease: "power3.inOut",
-//       });
-//     }
-//   };
-
-//   const toggleAutoRotate = () => {
-//     setAutoRotate(!autoRotate);
-//   };
-
-//   const removeDraggedImage = (id) => {
-//     setDraggedImages(prev => prev.filter(img => img.id !== id));
-//   };
-
-//   // Auto-rotation functionality
-//   useEffect(() => {
-//     if (!autoRotate) return;
-
-//     const interval = setInterval(() => {
-//       nextScreen();
-//     }, 4000);
-
-//     return () => clearInterval(interval);
-//   }, [autoRotate, currentAngleY, currentIndex]);
-
-//   useEffect(() => {
-//     // Cube section animations
-//     const cubeTl = gsap.timeline({
-//       scrollTrigger: {
-//         trigger: "#screens",
-//         start: "top 80%",
-//         toggleActions: "play none none none"
-//       }
-//     });
-    
-//     cubeTl
-//       .from(".cube-container", { 
-//         y: 150, 
-//         opacity: 0, 
-//         duration: 1.5, 
-//         ease: "power3.out" 
-//       })
-//       .from(".cube-face", { 
-//         scale: 0.8, 
-//         opacity: 0, 
-//         rotationX: 45, 
-//         stagger: 0.1, 
-//         duration: 1.2, 
-//         ease: "power3.out" 
-//       }, "-=1");
-
-//     return () => {
-//       ScrollTrigger.getAll().forEach(trigger => trigger.kill());
-//     };
-//   }, []);
-
-//   return (
-//     <section id="screens" className="relative w-full h-screen flex items-center justify-center bg-[#1a1333] overflow-hidden">
-//       <div className="absolute inset-0 z-0">
-//         <div className="w-full h-full bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-20" />
-//       </div>
-      
-//       <RadialMenu />
-      
-//       <div className="relative z-10 w-full h-full flex flex-col items-center justify-center px-4">
-//         <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-8 bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent">
-//           AI-Powered Solutions
-//         </h2>
-        
-//         <div 
-//           ref={containerRef}
-//           className="cube-container flex justify-center items-center relative"
-//           style={{ perspective: '1500px', height: '400px', width: '100%' }}
-//           onDrop={handleDrop}
-//           onDragOver={handleDragOver}
-//         >
-//           <div 
-//             ref={cubeRef}
-//             className="cube relative"
-//             style={{
-//               width: '300px',
-//               height: '200px',
-//               transformStyle: 'preserve-3d',
-//               transform: `rotateY(${currentAngleY}deg)`,
-//               transition: 'transform 1s ease'
-//             }}
-//           >
-//             {screenData.map((screen, i) => (
-//               <div 
-//                 key={i}
-//                 className="cube-face absolute w-full h-full bg-gray-800 border-2 border-purple-400 overflow-hidden shadow-2xl"
-//                 style={{ 
-//                   transform: `rotateY(${i * 90}deg) translateZ(150px)`,
-//                   filter: 'brightness(0.8)'
-//                 }}
-//               >
-//                 <img 
-//                   src={screen.img} 
-//                   alt={screen.title} 
-//                   className="w-full h-full object-cover transition-transform duration-500 hover:scale-110 cursor-grab active:cursor-grabbing" 
-//                   draggable
-//                   onDragStart={(e) => handleDragStart(e, screen, i)}
-//                 />
-//               </div>
-//             ))}
-//           </div>
-//         </div>
-        
-//         <div className="flex justify-center gap-6 mt-8">
-//           <button 
-//             onClick={prevScreen}
-//             className="font-bold px-4 py-2 rounded bg-purple-600 text-white hover:bg-purple-700 transition-colors"
-//           >
-//             ← Previous
-//           </button>
-
-//           <button 
-//             onClick={toggleAutoRotate}
-//             className={`font-bold px-4 py-2 rounded text-white ${
-//               autoRotate ? 'bg-green-600 hover:bg-green-700' : 'bg-red-600 hover:bg-red-700'
-//             } transition-colors`}
-//           >
-//             {autoRotate ? 'Auto ON' : 'Auto OFF'}
-//           </button>
-
-//           <button 
-//             onClick={nextScreen}
-//             className="font-bold px-4 py-2 rounded bg-purple-600 text-white hover:bg-purple-700 transition-colors"
-//           >
-//             Next →
-//           </button>
-//         </div>
-        
-//         <div className="screen-info text-center mt-8 text-gray-200 max-w-lg">
-//           <h3 className="text-xl font-semibold mb-2">{screenData[currentIndex].title}</h3>
-//           <p className="text-sm sm:text-base">{screenData[currentIndex].desc}</p>
-//         </div>
-//       </div>
-      
-//       <div className="absolute inset-0 bg-gradient-to-t from-[#1a1333] via-transparent to-[#1a1333]/60 pointer-events-none" />
-//     </section>
-//   );
-// };
- 
-const AuthHero = () => {
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0d0b33] to-[#0b0e2e] text-white flex items-center px-4 sm:px-6 md:px-10 lg:px-20 py-16 md:py-0">
-      <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-        <div className="z-10 order-2 md:order-1">
-          <p className="text-xs sm:text-sm text-purple-300 font-medium">
-            The <span className="text-purple-500">future</span> of business technology
-          </p>
-          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold leading-tight mt-4">
-            Transform Your Business<br />
-            <span className="text-purple-200">With Advanced AI Solutions</span>
-          </h1>
-          <ul className="text-gray-400 mt-4 text-sm sm:text-base">
-            <li className="flex items-start mb-2">
-              <span className="text-purple-400 mt-1 mr-2">•</span>
-              IT training with guaranteed placements through industry-focused curriculum and hands-on learning.
-            </li>
-            <li className="flex items-start">
-              <span className="text-purple-400 mt-1 mr-2">•</span>
-              Smart performance tracking with question analysis, scoring, and improvement tips to boost interview readiness.
-            </li>
-          </ul>
         </div>
 
-        <div className="relative flex justify-center items-center order-1 md:order-2">
-          <div className="absolute w-[250px] h-[250px] sm:w-[300px] sm:h-[300px] md:w-[400px] md:h-[400px] rounded-full bg-purple-800 blur-3xl opacity-40"></div>
-          <img
-            src={lmsHero}
-            alt="AI Solutions Platform"
-            className="relative w-full max-w-[300px] sm:max-w-[400px] md:max-w-[500px] h-auto object-contain z-10"
-          />
-        </div>
-      </div>
-    </div>
-  );
-};
-
-const Faster = () => {
-    return (
-      <section className="bg-[#0a1026] py-16 px-4 sm:px-6">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-2xl sm:text-3xl md:text-5xl font-extrabold text-white text-center mb-4">
-            Smarter Business Operations.
-          </h2>
-          <p className="text-zinc-400 text-center max-w-2xl mx-auto mb-12 text-sm sm:text-base md:text-lg">
-          Our AI solutions deliver automation, data insights, and process optimization. They empower teams to make faster decisions, reduce manual effort, and drive measurable business growth.
-          </p>
-  
-          <div className="bg-[#11182b] border border-zinc-700 rounded-2xl shadow-xl flex flex-col md:flex-row items-center md:items-stretch overflow-hidden"
-               style={{ minHeight: 400 }}>
-            <div className="flex-1 flex flex-col justify-center p-6 sm:p-8 md:p-12">
-              <h3 className="text-lg sm:text-xl md:text-2xl font-semibold text-white mb-3">
-                <span className="font-bold">Optimized for business transformation</span>
-              </h3>
-              <p className="text-zinc-400 mb-6 sm:mb-8 text-sm sm:text-base md:text-lg">
-                Our AI systems provide the most effective solutions for automating and optimizing your business processes.
-              </p>
-              <a
-                href="https://sklassics-ai.com/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-zinc-600 text-white font-medium hover:bg-purple-700/20 transition text-sm w-auto"
-              >
-                Visit SKlassic AI <span className="text-purple-400">&rarr;</span>
-              </a>
-            </div>
-            <div className="flex-1 flex items-center justify-center relative min-h-[250px] bg-transparent">
-              <img
-                src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1600&q=80"
-                alt="AI Solutions Visualization"
-                className="w-full max-w-[420px] h-auto object-contain mx-auto"
-                style={{ filter: "drop-shadow(0 0 60px #a78bfa66)" }}
-              />
-            </div>
-          </div>
-        </div>
-      </section>
-    );
-  };
-  
-const WhyTrustUs = () => {
-  const features = [
-    {
-      category: 'Business Solutions',
-      items: [
-        { icon: <LucideMessageCircle size={18} />, title: 'Process Automation' },
-        { icon: <LucideLayoutDashboard size={18} />, title: 'Data Analytics' },
-        { icon: <LucideSearch size={18} />, title: 'AI-Powered Insights' },
-      ],
-    },
-    {
-      category: 'Enterprise Features',
-      items: [
-        { icon: <LucideBarChart2 size={18} />, title: 'Performance Metrics' },
-        { icon: <LucideBell size={18} />, title: 'Real-time Alerts' },
-        { icon: <LucideLink size={18} />, title: 'System Integration' },
-      ],
-    },
-    {
-      category: 'Quality Standards',
-      items: [
-        { icon: <LucideShield size={18} />, title: 'Enterprise Security' },
-        { icon: <LucideDownload size={18} />, title: 'Data Export' },
-        { icon: <LucideClock size={18} />, title: '24/7 Monitoring' },
-      ],
-    },
-  ];
-
-  return (
-    <section className="bg-[#0E1321] text-white py-12 sm:py-16 px-4 sm:px-6 md:px-10 lg:px-16">
-      <div className="max-w-7xl mx-auto">
-        <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-white mb-4">
-          <span className="bg-gradient-to-r from-purple-400 to-white bg-clip-text text-transparent">
-            Why choose SKlassic AI?
-          </span>
-        </h2>
-        <p className="text-gray-300 text-sm sm:text-base mb-8 sm:mb-12 max-w-3xl">
-          We're redefining business technology with cutting-edge AI solutions, automation, and data analytics.
-        </p>
-
-        {features.map((group, i) => (
-          <div key={i} className="mb-8 sm:mb-10">
-            <h3 className="text-xs sm:text-sm text-purple-400 font-semibold mb-3 sm:mb-4">{group.category}</h3>
-            <div className="grid gap-4 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {group.items.map((item, j) => (
-                <div key={j} className="flex items-start space-x-3">
-                  <div className="text-purple-300 mt-0.5">{item.icon}</div>
-                  <div>
-                    <h4 className="text-white font-semibold text-base sm:text-lg mb-1">{item.title}</h4>
-                    <p className="text-gray-400 text-xs sm:text-sm">
-                      Our platform ensures the highest standards for your business operations.
-                    </p>
-                  </div>
+        {/* Hero slider */}
+        <div className="section" id="hero">
+          <div className="section-h"><h3>Spotlight</h3><span className="hint">Swipe or click to explore</span></div>
+          <div className="hero" onMouseEnter={() => setHoverHero(true)} onMouseLeave={() => setHoverHero(false)}>
+            <div className="hero-inner" ref={heroRef} onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
+              {IMGS.map((img, i) => (
+                <div className={`slide ${i === heroIndex ? "active" : ""}`} key={img.src} onClick={() => openLB(i)}>
+                  <img src={img.src} alt={img.title} loading="eager" />
                 </div>
+              ))}
+              <div className="fade-shadow" />
+              <div className="hero-cta">
+                <button className="pill filled" onClick={()=>{ setCat('All'); document.querySelector('#featured')?.scrollIntoView({behavior:'smooth'}); }}>Explore Featured</button>
+                <button className="pill" onClick={()=>{ setCat('Analytics'); document.querySelector('#gallery')?.scrollIntoView({behavior:'smooth'}); }}>See Analytics</button>
+              </div>
+              <div className="hero-info">
+                <p className="hero-title">{IMGS[heroIndex].title}</p>
+                <p className="hero-desc">{IMGS[heroIndex].desc}</p>
+              </div>
+              <div className="nav">
+                <button onClick={() => setHero((heroIndex - 1 + IMGS.length) % IMGS.length)} aria-label="Prev">◀</button>
+                <button onClick={() => setHero((heroIndex + 1) % IMGS.length)} aria-label="Next">▶</button>
+              </div>
+              <div className="progress"><div className="bar" ref={barRef} /></div>
+            </div>
+            <div className="thumbs">
+              {IMGS.map((img, i) => (
+                <button key={img.src} data-t={img.title} className={`thumb ${i === heroIndex ? "active" : ""}`} onClick={() => setHero(i)}>
+                  <img src={img.src} alt={`${img.title} thumbnail`} loading="lazy" />
+                </button>
               ))}
             </div>
           </div>
-        ))}
+        </div>
+
+        {/* Filters */}
+        <div className="section">
+          <div className="section-h"><h3>Filters</h3><span className="hint">Refine by category</span></div>
+          <div className="filters" role="tablist" aria-label="Categories">
+            {CATS.map(c => (
+              <button
+                key={c}
+                role="tab"
+                aria-selected={c === cat}
+                className={`chip ${c === cat ? "active" : ""}`}
+                onClick={() => setCat(c)}
+              >
+                {CAT_ICONS[c] || "•"} {c}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Featured slice */}
+        <div className="section" id="featured">
+          <div className="section-h"><h3>Featured</h3><span className="hint">Hand-picked highlights</span></div>
+          <div className={`grid ${compact ? "compact" : ""}`}>
+            {featured.map((img, idx) => (
+              <div
+                key={img.src}
+                className={`${idx % 2 === 0 ? "span-8 h-320" : "span-4 h-320"} card`}
+                onClick={() => setLightbox({ open: true, i: IMGS.findIndex(x => x.src === img.src) })}
+                title={`${img.title} — ${img.desc}`}
+              >
+                <span className="tag">{img.cat}</span>
+                <img src={img.src} alt={img.title} loading="lazy" />
+                <div className="cap">
+                  <p className="t">{img.title}</p>
+                  <p className="d">{img.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Grid gallery */}
+        {/* Grid gallery */}
+<div className="section" id="gallery">
+  <div className="section-h">
+    <h3>Gallery</h3>
+    <span className="hint">All items • {countLabel}</span>
+  </div>
+
+  <div className={`grid ${compact ? "compact" : ""}`}>
+    {finalList.map((img, idx) => (
+      <div
+        key={img.src}
+        className={`card ${idx % 8 === 0
+          ? "span-8 h-320"
+          : idx % 8 === 1
+          ? "span-4 h-320"
+          : idx % 8 < 4
+          ? "span-6 h-260"
+          : idx % 8 < 7
+          ? "span-4 h-200"
+          : "span-12 h-320"}`}
+        onClick={() =>
+          setLightbox({ open: true, i: IMGS.findIndex(x => x.src === img.src) })
+        }
+        title={`${img.title} — ${img.desc}`}
+      >
+        <span className="tag">{img.cat}</span>
+        <img src={img.src} alt={img.title} loading="lazy" />
+        <div className="cap">
+          <p className="t">{img.title}</p>
+          <p className="d">{img.desc}</p>
+        </div>
       </div>
-    </section>
-  );
-};
+    ))}
+  </div>
+</div>
 
-const FeatureCarousel = () => {
-  const scrollRef = useRef(null);
-  const cards = [
-    {
-      title: "Process Automation",
-      desc: "Streamline operations with intelligent automation solutions.",
-      icon: "🤖",
-    },
-    {
-      title: "Data Analytics",
-      desc: "Powerful insights from your business data in real-time.",
-      icon: "📊",
-    },
-    {
-      title: "AI Integration",
-      desc: "Seamlessly integrate AI into your existing systems.",
-      icon: "🧠",
-    },
-    {
-      title: "Enterprise Security",
-      desc: "Military-grade security for your sensitive data.",
-      icon: "🔒",
-    },
-    {
-      title: "Cloud Solutions",
-      desc: "Scalable cloud-based infrastructure for any business size.",
-      icon: "☁️",
-    },
-  ];
 
-  const scroll = (direction) => {
-    const scrollAmount = 300;
-    if (scrollRef.current) {
-      scrollRef.current.scrollBy({
-        left: direction === "left" ? -scrollAmount : scrollAmount,
-        behavior: "smooth",
-      });
-    }
-  };
-
-  return (
-    <div className="bg-[#0a0c1b] text-white py-12 sm:py-16 px-4">
-      <div className="text-center max-w-3xl mx-auto mb-8 sm:mb-10">
-        <p className="text-xs sm:text-sm text-purple-400 font-medium">SKlassic AI Features</p>
-        <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mt-2 mb-3 sm:mb-4">Your business transformation platform</h2>
-        <p className="text-gray-400 text-sm sm:text-base">
-          Experience the future of business operations with our comprehensive AI solutions.
-        </p>
-      </div>
-
-      <div className="relative">
-        <div
-          ref={scrollRef}
-          className="flex overflow-x-auto no-scrollbar scroll-smooth space-x-4 px-2"
-        >
-          {cards.map((card, index) => (
-            <div
-              key={index}
-              className="min-w-[220px] sm:min-w-[250px] md:min-w-[280px] bg-[#101223] rounded-xl border border-[#1d2033] p-4 sm:p-5 hover:bg-gradient-to-br from-purple-800/20 to-transparent transition duration-300"
-            >
-              <div className="text-2xl mb-3">{card.icon}</div>
-              <h3 className="text-base sm:text-lg font-semibold mb-2">{card.title}</h3>
-              <p className="text-gray-400 text-xs sm:text-sm">{card.desc}</p>
+        {/* Lightbox */}
+        {lightbox.open && (
+          <div className="lightbox" onClick={closeLB}>
+            <div className="lb-inner" onClick={(e) => e.stopPropagation()}>
+              <div className="lb-head">
+                <h3 className="lb-title">{IMGS[lightbox.i].title}</h3>
+                <button className="lb-close" onClick={closeLB}>Close</button>
+              </div>
+              <div className="lb-media">
+                <img src={IMGS[lightbox.i].src} alt={IMGS[lightbox.i].title} />
+                <div className="lb-nav">
+                  <button className="lb-btn" onClick={prevLB}>◀</button>
+                  <button className="lb-btn" onClick={nextLB}>▶</button>
+                </div>
+              </div>
             </div>
-          ))}
-        </div>
-
-        <div className="flex justify-center gap-4 mt-6">
-          <button
-            onClick={() => scroll("left")}
-            className="bg-[#1d2033] hover:bg-[#292d45] p-2 rounded-full text-white"
-            aria-label="Scroll left"
-          >
-            <FaArrowLeft size={14} />
-          </button>
-          <button
-            onClick={() => scroll("right")}
-            className="bg-[#1d2033] hover:bg-[#292d45] p-2 rounded-full text-white"
-            aria-label="Scroll right"
-          >
-            <FaArrowRight size={14} />
-          </button>
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );
-};
-
-const AiInterviewDisplay = () => {
-  return (
-    <div className="bg-[#0a0a23] text-white">
-      <CubeGallery />
-      <AuthHero />
-      <Faster />
-      <WhyTrustUs />
-      <FeatureCarousel />
-      <Footer />
-    </div>
-  );
-};
-
-export default AiInterviewDisplay;
+}

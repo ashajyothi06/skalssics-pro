@@ -349,13 +349,67 @@
 // export default AboutCompany;
 
 
-
+{/*import { 
+  Users, 
+  Cpu, 
+  Code, 
+  GraduationCap, 
+  Lightbulb, 
+  Clock, 
+  Rocket, 
+  Handshake 
+} from 'lucide-react'; // or from your specific icon library
 import React, { useEffect, useRef, useState } from "react";
 import { motion, useAnimation, useInView, useScroll, useTransform } from 'framer-motion';
 import { ArrowRight, Users, Briefcase, Target, ChevronRight, Laptop, Smartphone, Cloud, Plane, BookOpen, Lightbulb, Car, Code, Zap, Building, Star, Heart, Shield, Globe, Sparkles } from 'lucide-react';
 import DynamicTimestamp from "../components/ui/DynamicTimeStamp";
 import sklassics_logo from "../assets/sklassics_logo.jpg";
-import { GraduationCap, MonitorSmartphone, BrainCircuit, PlaneTakeoff, Presentation, PenTool, Wrench, Bug, ShoppingCart, BarChart3, LineChart, Database, Settings, Link2, ShieldCheck } from 'lucide-react';
+import { GraduationCap, MonitorSmartphone, BrainCircuit, PlaneTakeoff, Presentation, PenTool, Wrench, Bug, ShoppingCart, BarChart3, LineChart, Database, Settings, Link2, ShieldCheck } from 'lucide-react';*/}
+import React, { useEffect, useRef, useState } from "react";
+import { motion, useAnimation, useInView, useScroll, useTransform } from 'framer-motion';
+import {
+  ArrowRight,
+  Users,
+  Briefcase,
+  Target,
+  ChevronRight,
+  Laptop,
+  Smartphone,
+  Cloud,
+  Plane,
+  BookOpen,
+  Lightbulb,
+  Car,
+  Code,
+  Zap,
+  Building,
+  Star,
+  Heart,
+  Shield,
+  Globe,
+  Sparkles,
+  Cpu,
+  GraduationCap,
+  Clock,
+  Rocket,
+  Handshake,
+  MonitorSmartphone,
+  BrainCircuit,
+  PlaneTakeoff,
+  Presentation,
+  PenTool,
+  Wrench,
+  Bug,
+  ShoppingCart,
+  BarChart3,
+  LineChart,
+  Database,
+  Settings,
+  Link2,
+  ShieldCheck
+} from 'lucide-react';
+import DynamicTimestamp from "../components/ui/DynamicTimeStamp";
+import sklassics_logo from "../assets/sklassics_logo.jpg";
 
 const AboutCompany = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -510,54 +564,74 @@ const AboutCompany = () => {
           {/* Content Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Left Column - WHO WE ARE */}
-            <motion.div 
-              className="bg-dark-800/60 backdrop-blur-md p-6 rounded-2xl border border-purple-900/40 shadow-xl"
-              variants={itemVariants}
-              whileHover={{ scale: 1.03, boxShadow: '0 8px 32px 0 rgba(168,85,247,0.25)' }}
-              transition={{ type: 'spring', stiffness: 300 }}
-            >
-              <motion.h3 
-                className="text-lg md:text-xl font-bold text-purple-400 mb-4 flex items-center gap-2"
-                whileHover={{ x: 5 }}
-              >
-                <Users className="w-5 h-5" /> WHO WE ARE
-              </motion.h3>
-              <motion.ul className="space-y-4 text-gray-200 text-base md:text-lg">
-                <motion.li className="flex items-start gap-2">
-                  <span className="text-purple-400 mt-1">•</span>
-                  We're a team of passionate tech professionals focused on building a better future through smart and modern IT solutions.
-                </motion.li>
-                <motion.li className="flex items-start gap-2">
-                  <span className="text-purple-400 mt-1">•</span>
-                  We offer IT consulting, website & mobile app development, software maintenance/testing, and AI integration.
-                </motion.li>
-                <motion.li className="flex items-start gap-2">
-                  <span className="text-purple-400 mt-1">•</span>
-                  We use the latest technology to build strong, flexible solutions for business needs.
-                </motion.li>
-                <motion.li className="flex items-start gap-2">
-                  <span className="text-purple-400 mt-1">•</span>
-                  We provide IT training and placement support to help people get real-world skills and start their careers.
-                </motion.li>
-                <motion.li className="flex items-start gap-2">
-                  <span className="text-purple-400 mt-1">•</span>
-                  Whether supporting students or helping startups grow, Sklassics turns ideas into reality and makes technology work for everyone.
-                </motion.li>
-                <motion.li className="flex items-start gap-2">
-                  <span className="text-purple-400 mt-1">•</span>
-                  We follow agile and client-centric approaches to ensure every project meets deadlines without compromising quality.
-                </motion.li>
-                <motion.li className="flex items-start gap-2">
-                  <span className="text-purple-400 mt-1">•</span>
-                  Our team continuously researches emerging technologies to keep solutions future-ready and competitive.
-                </motion.li>
-                <motion.li className="flex items-start gap-2">
-                  <span className="text-purple-400 mt-1">•</span>
-                  We believe in long-term partnerships, offering ongoing support and optimization to help clients adapt and scale effortlessly.
-                </motion.li>
-              </motion.ul>
-            </motion.div>
+            {/* Left Column - WHO WE ARE */}
 
+<motion.div 
+  className="bg-dark-800/60 backdrop-blur-md p-6 rounded-2xl border border-blue-900/40 shadow-xl"
+  variants={itemVariants}
+  whileHover={{ scale: 1.03, boxShadow: '0 8px 32px 0 rgba(59,130,246,0.20)' }}
+  transition={{ type: 'spring', stiffness: 300 }}
+>
+  <motion.h3 
+    className="text-lg md:text-xl font-bold text-blue-400 mb-4 flex items-center gap-2"
+    whileHover={{ x: 5 }}
+  >
+    <Users className="w-5 h-5" /> WHO WE ARE
+  </motion.h3>
+
+  <motion.ul 
+    className="space-y-3 text-gray-300 text-sm md:text-base"
+    initial={{ opacity: 0 }}
+    animate={isVisible ? { opacity: 1 } : {}}
+    transition={{ delay: 0.2 }}
+  >
+    {[
+      {
+        text: "We're a team of passionate tech professionals focused on building a better future through smart and modern IT solutions. We offer IT consulting, website & mobile app development, software maintenance/testing, and AI integration.",
+        icon: <Users className="w-4 h-4 text-purple-400" />
+      },
+      {
+        text: "We use the latest technology to build strong, flexible solutions for business needs. We follow agile and client-centric approaches to ensure every project meets deadlines without compromising quality.",
+        icon: <Code className="w-4 h-4 text-green-400" />
+      },
+      {
+        text: "We provide IT training and placement support to help people get real-world skills and start their careers. Whether supporting students or helping startups grow, Sklassics turns ideas into reality and makes technology work for everyone.",
+        icon: <GraduationCap className="w-4 h-4 text-yellow-400" />
+      },
+      {
+        text: "Our team continuously researches emerging technologies to keep solutions future-ready and competitive. We believe in long-term partnerships, offering ongoing support and optimization to help clients adapt and scale effortlessly.",
+        icon: <Rocket className="w-4 h-4 text-pink-400" />
+      }
+    ].map((item, index) => (
+      <motion.li
+        key={index}
+        className="flex items-start gap-3 p-3 rounded-lg bg-dark-700/30 border border-gray-700/30 hover:border-purple-500/50 transition-all duration-300 group"
+        initial={{ opacity: 0, x: -20 }}
+        animate={isVisible ? { opacity: 1, x: 0 } : {}}
+        transition={{ delay: 0.3 + index * 0.07 }}
+        whileHover={{ 
+          scale: 1.04, 
+          backgroundColor: "rgba(168, 85, 247, 0.12)",
+          borderColor: "rgba(168, 85, 247, 0.5)"
+        }}
+      >
+        <motion.div
+          className="p-2 rounded-full bg-purple-500/20 border border-purple-500/30 group-hover:bg-purple-500/30"
+          whileHover={{ scale: 1.1, rotate: 5 }}
+          animate={{ scale: [1, 1.05, 1] }}
+          transition={{ duration: 2, repeat: Infinity, delay: index * 0.1 }}
+        >
+          {item.icon}
+        </motion.div>
+        <span className="text-gray-300 group-hover:text-white transition-colors">{item.text}</span>
+      </motion.li>
+    ))}
+  </motion.ul>
+</motion.div>
+
+          
+
+            
             {/* Right Column - OUR SERVICES */}
             <motion.div 
               className="bg-dark-800/60 backdrop-blur-md p-6 rounded-2xl border border-blue-900/40 shadow-xl"
@@ -623,39 +697,72 @@ const AboutCompany = () => {
               </motion.div>
             </motion.div>
 
-            {/* Bottom Left - OUR MISSION */}
-            <motion.div 
-              className="bg-dark-800/60 backdrop-blur-md p-6 rounded-2xl border border-purple-900/40 shadow-xl"
-              variants={itemVariants}
-              whileHover={{ scale: 1.03, boxShadow: '0 8px 32px 0 rgba(168,85,247,0.25)' }}
-              transition={{ type: 'spring', stiffness: 300 }}
-            >
-              <motion.h3 
-                className="text-lg md:text-xl font-bold text-purple-400 mb-4 flex items-center gap-2"
-                whileHover={{ x: 5 }}
-              >
-                <Target className="w-5 h-5" /> OUR MISSION
-              </motion.h3>
-              <motion.ul className="space-y-4 text-gray-200 text-base md:text-lg">
-                <motion.li className="flex items-start gap-2">
-                  <span className="text-purple-400 mt-1">•</span>
-                  Deliver end-to-end IT services that empower individuals, startups, and businesses to grow through innovation, skill-building, and smart technology.
-                </motion.li>
-                <motion.li className="flex items-start gap-2">
-                  <span className="text-purple-400 mt-1">•</span>
-                  Simplify digital transformation with high-quality training, reliable job placement, and custom web, mobile, and AI solutions.
-                </motion.li>
-                <motion.li className="flex items-start gap-2">
-                  <span className="text-purple-400 mt-1">•</span>
-                  Create meaningful digital experiences that solve real-world problems and foster career success.
-                </motion.li>
-                <motion.li className="flex items-start gap-2">
-                  <span className="text-purple-400 mt-1">•</span>
-                  Enable long-term progress for every client and learner we serve.
-                </motion.li>
-              </motion.ul>
-            </motion.div>
+            {/* Bottom Left - OUR INITIATIVES */}
+            {/* Bottom Left - OUR INITIATIVES */}
+<motion.div 
+  className="bg-dark-800/60 backdrop-blur-md p-6 rounded-2xl border border-purple-900/40 shadow-xl"
+  variants={itemVariants}
+  whileHover={{ scale: 1.03, boxShadow: '0 8px 32px 0 rgba(168,85,247,0.25)' }}
+  transition={{ type: 'spring', stiffness: 300 }}
+>
+  <motion.h3 
+    className="text-lg md:text-xl font-bold text-purple-400 mb-4 flex items-center gap-2"
+    whileHover={{ x: 5 }}
+  >
+    <Target className="w-5 h-5" /> OUR INITIATIVES
+  </motion.h3>
 
+  <motion.ul 
+    className="space-y-3 text-gray-300 text-sm md:text-base"
+    initial={{ opacity: 0 }}
+    animate={isVisible ? { opacity: 1 } : {}}
+    transition={{ delay: 0.2 }}
+  >
+    {[
+      {
+        text: "Deliver end-to-end IT services that empower individuals, startups, and businesses to grow through innovation, skill-building, and smart technology.",
+        icon: <Lightbulb className="w-4 h-4 text-yellow-400" />
+      },
+      {
+        text: "Simplify digital transformation with high-quality training, reliable job placement, and custom web, mobile, and AI solutions.",
+        icon: <Cpu className="w-4 h-4 text-blue-400" />
+      },
+      {
+        text: "Create meaningful digital experiences that solve real-world problems and foster career success.",
+        icon: <Globe className="w-4 h-4 text-green-400" />
+      },
+      {
+        text: "Enable long-term progress for every client and learner we serve.",
+        icon: <Rocket className="w-4 h-4 text-pink-400" />
+      }
+    ].map((item, index) => (
+      <motion.li
+        key={index}
+        className="flex items-start gap-3 p-3 rounded-lg bg-dark-700/30 border border-gray-700/30 hover:border-purple-500/50 transition-all duration-300 group"
+        initial={{ opacity: 0, x: -20 }}
+        animate={isVisible ? { opacity: 1, x: 0 } : {}}
+        transition={{ delay: 0.3 + index * 0.07 }}
+        whileHover={{ 
+          scale: 1.04, 
+          backgroundColor: "rgba(168, 85, 247, 0.12)",
+          borderColor: "rgba(168, 85, 247, 0.5)"
+        }}
+      >
+        <motion.div
+          className="p-2 rounded-full bg-purple-500/20 border border-purple-500/30 group-hover:bg-purple-500/30"
+          whileHover={{ scale: 1.1, rotate: 5 }}
+          animate={{ scale: [1, 1.05, 1] }}
+          transition={{ duration: 2, repeat: Infinity, delay: index * 0.1 }}
+        >
+          {item.icon}
+        </motion.div>
+        <span className="text-gray-300 group-hover:text-white transition-colors">{item.text}</span>
+      </motion.li>
+    ))}
+  </motion.ul>
+</motion.div>
+
+            
             {/* Bottom Right - Company Image */}
             <motion.div 
               className="flex justify-center items-center relative"

@@ -121,8 +121,8 @@ const AboutCompany = () => {
                   {text:"We provide IT training & placements to help students and startups grow.",desktop:"We provide IT training and placement support to help people get real-world skills and start their careers. Whether supporting students or helping startups grow, Sklassics turns ideas into reality and makes technology work for everyone.",icon:<GraduationCap className="w-4 h-4 text-yellow-400"/>},
                   {text:"We research emerging tech & build future-ready solutions for clients.",desktop:"Our team continuously researches emerging technologies to keep solutions future-ready and competitive. We believe in long-term partnerships, offering ongoing support and optimization to help clients adapt and scale effortlessly.",icon:<Rocket className="w-4 h-4 text-pink-400"/>}
                 ].map((item, index) => (
-                  <motion.li key={index} className="flex items-start gap-0 p-0 rounded-lg bg-dark-700/30 border border-gray-700/30">
-                    <motion.div className="p-0 rounded-full bg-purple-500/20 border border-purple-500/30">{item.icon}</motion.div>
+                  <motion.li key={index} className="flex items-start gap-1 p-1 rounded-lg bg-dark-700/30 border border-gray-700/30">
+                    <motion.div className="p-1 rounded-full bg-purple-500/20 border border-purple-500/30">{item.icon}</motion.div>
                     <span className="block sm:hidden">{item.text}</span>
                     <span className="hidden sm:block">{item.desktop}</span>
                   </motion.li>

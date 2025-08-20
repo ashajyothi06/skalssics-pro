@@ -67,7 +67,7 @@ const AboutCompany = () => {
   };
 
   return (
-    <div ref={containerRef} className="min-h-screen bg-dark-950 text-white font-sans px-6 py-6 relative overflow-hidden">
+    <div ref={containerRef} className="min-h-screen bg-dark-950 text-white font-sans px-2 py-2 relative overflow-hidden">
       {/* Background Elements */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
         <motion.div 
@@ -89,7 +89,7 @@ const AboutCompany = () => {
 
       {/* Wrapper */}
       <motion.div 
-        className="pt-8 max-w-8xl mx-auto relative rounded-xl bg-gradient-to-br from-dark-900 via-dark-800 to-dark-900 p-6 border border-dark-700/50 shadow-inner mt-6 dark-card hover:shadow-glow-purple"
+        className="pt-8 max-w-8xl mx-auto relative rounded-xl bg-gradient-to-br from-dark-900 via-dark-800 to-dark-900 p-2 border border-dark-700/50 shadow-inner mt-6 dark-card hover:shadow-glow-purple"
         initial={{ opacity: 0, y: 50 }}
         animate={isVisible ? { opacity: 1, y: 0 } : {}}
         transition={{ duration: 0.8 }}
@@ -104,14 +104,14 @@ const AboutCompany = () => {
         {/* Content */}
         <div className="max-w-6xl mx-auto">
           <motion.div className="mb-8" variants={itemVariants} initial="hidden" animate={isVisible ? "visible" : "hidden"}>
-            <motion.h2 className="text-2xl md:text-3xl font-extrabold bg-gradient-to-r from-purple-400 via-blue-400 to-pink-400 bg-clip-text text-transparent tracking-widest flex items-center gap-2 animate-text-shimmer">
+            <motion.h2 className="text-2xl md:text-3xl font-extrabold bg-gradient-to-r from-purple-400 via-blue-400 to-pink-400 bg-clip-text text-transparent tracking-widest flex items-center gap-1 animate-text-shimmer">
               <Sparkles className="w-6 h-6 text-purple-400" /> ABOUT US
             </motion.h2>
             <motion.div className="h-1 w-24 bg-gradient-to-r from-purple-400 via-blue-400 to-pink-400 rounded-full mt-2 mb-4 animate-pulse" />
           </motion.div>
 
           {/* Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-1">
             {/* WHO WE ARE */}
             <motion.div className="bg-dark-800/60 backdrop-blur-md p-1 rounded-2xl border border-blue-900/40 shadow-xl" variants={itemVariants}>
               <motion.h3 className="text-lg md:text-xl font-bold text-blue-400 mb-4 flex items-center gap-0"><Users className="w-5 h-5" /> WHO WE ARE</motion.h3>
@@ -131,10 +131,10 @@ const AboutCompany = () => {
             </motion.div>
 
             {/* OUR SERVICES */}
-            <motion.div className="bg-dark-800/60 backdrop-blur-md p-4 rounded-2xl border border-blue-900/40 shadow-xl" variants={itemVariants}>
-              <motion.h3 className="text-lg md:text-xl font-bold text-blue-400 mb-4 flex items-center gap-2"><Briefcase className="w-5 h-5" /> OUR SERVICES</motion.h3>
+            <motion.div className="bg-dark-800/60 backdrop-blur-md p-2 rounded-2xl border border-blue-900/40 shadow-xl" variants={itemVariants}>
+              <motion.h3 className="text-lg md:text-xl font-bold text-blue-400 mb-4 flex items-center gap-1"><Briefcase className="w-5 h-5" /> OUR SERVICES</motion.h3>
               <motion.p className="text-gray-300 mb-4 text-sm sm:text-base">We provide a comprehensive suite of offerings including:</motion.p>
-              <motion.div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <motion.div className="grid grid-cols-1 md:grid-cols-2 gap-1">
                 {[{ text: "Professional IT Training & Job Placements", icon: GraduationCap, color: "indigo" },
                   { text: "Custom Web & Mobile App Development", icon: MonitorSmartphone, color: "blue" },
                   { text: "AI & Cloud Integration Solutions", icon: BrainCircuit, color: "cyan" },
@@ -151,8 +151,8 @@ const AboutCompany = () => {
                   { text: "API Development & Third-party Integrations", icon: Link2, color: "violet" },
                   { text: "Cybersecurity & Compliance Consulting", icon: ShieldCheck, color: "rose" }
                 ].map((service, index) => (
-                  <motion.div key={index} className="flex items-center gap-3 p-3 rounded-lg bg-dark-700/30 border border-gray-700/30 group">
-                    <motion.div className={`p-2 rounded-full bg-${service.color}-500/20 border border-${service.color}-500/30`}>
+                  <motion.div key={index} className="flex items-center gap-1 p-1 rounded-lg bg-dark-700/30 border border-gray-700/30 group">
+                    <motion.div className={`p-1 rounded-full bg-${service.color}-500/20 border border-${service.color}-500/30`}>
                       <service.icon className={`w-4 h-4 text-${service.color}-400`} />
                     </motion.div>
                     <span className="text-sm text-gray-300 group-hover:text-white transition-colors">{service.text}</span>
@@ -162,16 +162,16 @@ const AboutCompany = () => {
             </motion.div>
 
             {/* OUR INITIATIVES */}
-            <motion.div className="bg-dark-800/60 backdrop-blur-md p-4 rounded-2xl border border-purple-900/40 shadow-xl" variants={itemVariants}>
-              <motion.h3 className="text-lg md:text-xl font-bold text-purple-400 mb-4 flex items-center gap-2"><Target className="w-5 h-5" /> OUR INITIATIVES</motion.h3>
+            <motion.div className="bg-dark-800/60 backdrop-blur-md p-1 rounded-2xl border border-purple-900/40 shadow-xl" variants={itemVariants}>
+              <motion.h3 className="text-lg md:text-xl font-bold text-purple-400 mb-4 flex items-center gap-1"><Target className="w-5 h-5" /> OUR INITIATIVES</motion.h3>
               <motion.ul className="space-y-3 text-gray-300 text-sm sm:text-base leading-relaxed">
                 {[{text:"End-to-end IT services that help individuals & businesses grow.",desktop:"Deliver end-to-end IT services that empower individuals, startups, and businesses to grow through innovation, skill-building, and smart technology.",icon:<Lightbulb className="w-4 h-4 text-yellow-400"/>},
                   {text:"Simplifying digital transformation with training & AI solutions.",desktop:"Simplify digital transformation with high-quality training, reliable job placement, and custom web, mobile, and AI solutions.",icon:<Cpu className="w-4 h-4 text-blue-400"/>},
                   {text:"Create real digital experiences that boost careers.",desktop:"Create meaningful digital experiences that solve real-world problems and foster career success.",icon:<Globe className="w-4 h-4 text-green-400"/>},
                   {text:"Enabling long-term success for clients & learners.",desktop:"Enable long-term progress for every client and learner we serve.",icon:<Rocket className="w-4 h-4 text-pink-400"/>}
                 ].map((item, index) => (
-                  <motion.li key={index} className="flex items-start gap-3 p-3 rounded-lg bg-dark-700/30 border border-gray-700/30">
-                    <motion.div className="p-2 rounded-full bg-purple-500/20 border border-purple-500/30">{item.icon}</motion.div>
+                  <motion.li key={index} className="flex items-start gap-2 p-1 rounded-lg bg-dark-700/30 border border-gray-700/30">
+                    <motion.div className="p-1 rounded-full bg-purple-500/20 border border-purple-500/30">{item.icon}</motion.div>
                     <span className="block sm:hidden">{item.text}</span>
                     <span className="hidden sm:block">{item.desktop}</span>
                   </motion.li>
@@ -182,10 +182,10 @@ const AboutCompany = () => {
             {/* Logo */}
             <motion.div className="flex justify-center items-center relative" initial={{ opacity: 0, scale: 0.8 }} animate={isVisible ? { opacity: 1, scale: 1 } : {}}>
               <motion.div className="relative">
-                <motion.div className="rounded-full bg-white p-4 w-64 h-64 flex items-center justify-center shadow-[0_0_30px_rgba(168,85,247,0.6)] border border-purple-500/30">
+                <motion.div className="rounded-full bg-white p-1 w-64 h-64 flex items-center justify-center shadow-[0_0_30px_rgba(168,85,247,0.6)] border border-purple-500/30">
                   <motion.img src={sklassics_logo} alt="Sklassics Technologies" className="w-56 h-56 object-contain rounded-full" />
                 </motion.div>
-                <motion.div className="absolute bottom-4 right-4 bg-black/80 border border-purple-500 text-xs px-4 py-2 rounded-full text-white flex items-center gap-2">
+                <motion.div className="absolute bottom-4 right-4 bg-black/80 border border-purple-500 text-xs px-4 py-2 rounded-full text-white flex items-center gap-1">
                   <motion.span className="h-2 w-2 rounded-full bg-green-500" animate={{ scale: [1, 1.2, 1] }} transition={{ duration: 2, repeat: Infinity }} />
                   SINCE 2023
                 </motion.div>

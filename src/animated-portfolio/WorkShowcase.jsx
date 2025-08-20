@@ -1,56 +1,67 @@
 import React, { useState } from "react";
 import ai_inter from "../assets/ai_inter.gif";
 import car from "../assets/car.gif"; // Assuming you have this image in your assets
+
 const works = [
   {
     id: 1,
     image: ai_inter,
-    hoverText: "AI Interview Panel uses NLP and machine learning to evaluate answers, provide insights, and mimic human-like interviews across various domains.",
+    hoverText:
+      "AI Interview Panel uses NLP and machine learning to evaluate answers, provide insights, and mimic human-like interviews across various domains.",
   },
   {
     id: 2,
     image: car,
-    hoverText: "Hanuman Car Rental is a full-fledged car booking solution that streamlines both customer and admin experiences.",
+    hoverText:
+      "Hanuman Car Rental is a full-fledged car booking solution that streamlines both customer and admin experiences.",
   },
   {
     id: 3,
     image: "https://framerusercontent.com/images/fwGDNPhCZCyX8PlsEylNPGm27qQ.png?scale-down-to=1024",
-    hoverText: "Hanuman Car Rental is a full-fledged car booking solution that streamlines both customer and admin experiences.",
+    hoverText:
+      "Hanuman Car Rental is a full-fledged car booking solution that streamlines both customer and admin experiences.",
   },
   {
     id: 4,
     image: "https://framerusercontent.com/images/EykVu3pj9zkotY7bzf2QCZjHjuQ.png?scale-down-to=102",
-    hoverText: "Hanuman Car Rental is a full-fledged car booking solution that streamlines both customer and admin experiences.",
+    hoverText:
+      "Hanuman Car Rental is a full-fledged car booking solution that streamlines both customer and admin experiences.",
   },
   {
     id: 5,
     image: "https://framerusercontent.com/images/BTAv0a0yrLmuy4kkhV0wLsh3cc.png?scale-down-to=1024",
-    hoverText: "Hanuman Car Rental is a full-fledged car booking solution that streamlines both customer and admin experiences.",
+    hoverText:
+      "Hanuman Car Rental is a full-fledged car booking solution that streamlines both customer and admin experiences.",
   },
   {
     id: 6,
     image: "https://framerusercontent.com/images/WwxfZAHzf8NOt7L4WHh5ik61JZ8.png?scale-down-to=1024",
-    hoverText: "Hanuman Car Rental is a full-fledged car booking solution that streamlines both customer and admin experiences.",
+    hoverText:
+      "Hanuman Car Rental is a full-fledged car booking solution that streamlines both customer and admin experiences.",
   },
   {
     id: 7,
     image: "https://framerusercontent.com/images/TgEDTV6rBox0uL9kYl4TAj3q0.png?scale-down-to=1024",
-    hoverText: "Hanuman Car Rental is a full-fledged car booking solution that streamlines both customer and admin experiences.",
+    hoverText:
+      "Hanuman Car Rental is a full-fledged car booking solution that streamlines both customer and admin experiences.",
   },
   {
     id: 8,
     image: "https://framerusercontent.com/images/RuzIWl0Azju06LF1izlciX2k.png?scale-down-to=1024",
-    hoverText: "Hanuman Car Rental is a full-fledged car booking solution that streamlines both customer and admin experiences.",
+    hoverText:
+      "Hanuman Car Rental is a full-fledged car booking solution that streamlines both customer and admin experiences.",
   },
   {
     id: 9,
     image: "https://framerusercontent.com/images/33oivZCyqPvtv4fCgpIL9kNI2GY.png?scale-down-to=1024",
-    hoverText: "Hanuman Car Rental is a full-fledged car booking solution that streamlines both customer and admin experiences.",
+    hoverText:
+      "Hanuman Car Rental is a full-fledged car booking solution that streamlines both customer and admin experiences.",
   },
   {
     id: 10,
     image: "https://framerusercontent.com/images/IWQPmnzhZun3YbLslS2CnjAf5Q.png?scale-down-to=1024",
-    hoverText: "Hanuman Car Rental is a full-fledged car booking solution that streamlines both customer and admin experiences.",
+    hoverText:
+      "Hanuman Car Rental is a full-fledged car booking solution that streamlines both customer and admin experiences.",
   },
 ];
 
@@ -79,10 +90,8 @@ const WorkShowcase = () => {
   const nextCard = works[currentIndex + visibleCards];
 
   // Responsive card sizes (now fills most of the viewport, with padding)
-  const getCardWidth = () =>
-    Math.min(window.innerWidth - 32, 480); // 32px padding, max 480px
-  const getCardHeight = () =>
-    Math.min(window.innerHeight - 120, 600); // 120px padding/top space, max 600px
+  const getCardWidth = () => Math.min(window.innerWidth - 32, 480); // 32px padding, max 480px
+  const getCardHeight = () => Math.min(window.innerHeight - 120, 600); // 120px padding/top space, max 600px
 
   // Use state to force re-render on resize for responsive sizing
   const [dimensions, setDimensions] = useState({
@@ -107,7 +116,9 @@ const WorkShowcase = () => {
 
   return (
     <div className="relative bg-black p-4 sm:p-8 text-white max-w-full mx-auto h-full rounded-xl overflow-hidden">
-      <h2 className="text-2xl sm:text-3xl font-semibold mb-6 text-center">Our Work</h2>
+      <h2 className="text-2xl sm:text-3xl font-semibold mb-6 text-center">
+        Our Work
+      </h2>
       <div
         className={`flex items-center justify-center ${isMobile ? "" : ""}`}
         style={{
@@ -188,6 +199,7 @@ const WorkShowcase = () => {
           </div>
         )}
       </div>
+
       {/* Carousel Dots */}
       <div className="flex justify-center mt-6 gap-2">
         {Array.from({ length: works.length - cardsToShow + 1 }).map((_, idx) => (
@@ -203,7 +215,21 @@ const WorkShowcase = () => {
           />
         ))}
       </div>
-      {/* Navigation Buttons */}
+
+      {/* ✅ Mobile Only Next Button */}
+      {isMobile && (
+        <div className="flex justify-center mt-4">
+          <button
+            onClick={next}
+            disabled={currentIndex >= works.length - cardsToShow}
+            className="px-6 py-2 bg-purple-600 text-white text-sm rounded-full shadow-lg hover:bg-purple-700 transition disabled:opacity-50"
+          >
+            Next →
+          </button>
+        </div>
+      )}
+
+      {/* Navigation Buttons (desktop & mobile side arrows) */}
       <button
         onClick={prev}
         disabled={currentIndex === 0}

@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef, useState } from "react";
 import { motion, useAnimation, useInView, useScroll, useTransform } from 'framer-motion';
 import {
@@ -98,7 +97,7 @@ const AboutCompany = () => {
   };
 
   return (
-    <div ref={containerRef} className="min-h-screen bg-dark-950 text-white font-sans px-6 py-6 relative overflow-hidden">
+    <div ref={containerRef} className="min-h-screen bg-dark-950 text-white font-sans px-4 sm:px-6 py-6 relative overflow-hidden">
       {/* Enhanced Background Elements */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
         <motion.div 
@@ -134,7 +133,7 @@ const AboutCompany = () => {
 
       {/* Main content wrapper */}
       <motion.div 
-        className="pt-8 max-w-8xl mx-auto relative rounded-xl bg-gradient-to-br from-dark-900 via-dark-800 to-dark-900 p-6 border border-dark-700/50 shadow-inner mt-6 dark-card transform transition-all duration-300 hover:shadow-glow-purple"
+        className="pt-8 max-w-8xl mx-auto relative rounded-xl bg-gradient-to-br from-dark-900 via-dark-800 to-dark-900 p-4 sm:p-6 border border-dark-700/50 shadow-inner mt-6 dark-card transform transition-all duration-300 hover:shadow-glow-purple"
         initial={{ opacity: 0, y: 50 }}
         animate={isVisible ? { opacity: 1, y: 0 } : {}}
         transition={{ duration: 0.8 }}
@@ -180,7 +179,7 @@ const AboutCompany = () => {
         <div className="max-w-6xl mx-auto">
           {/* ABOUT US Heading */}
           <motion.div 
-            className="mb-8"
+            className="mb-6 sm:mb-8"
             variants={itemVariants}
             initial="hidden"
             animate={isVisible ? "visible" : "hidden"}
@@ -196,67 +195,59 @@ const AboutCompany = () => {
           </motion.div>
 
           {/* Content Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
             {/* Left Column - WHO WE ARE */}
-            {/* Left Column - WHO WE ARE */}
+            <motion.div 
+              className="bg-dark-800/60 backdrop-blur-md p-4 sm:p-6 rounded-2xl border border-blue-900/40 shadow-xl"
+              variants={itemVariants}
+              whileHover={{ scale: 1.03, boxShadow: '0 8px 32px 0 rgba(59,130,246,0.20)' }}
+              transition={{ type: 'spring', stiffness: 300 }}
+            >
+              <motion.h3 
+                className="text-lg md:text-xl font-bold text-blue-400 mb-4 flex items-center gap-2"
+                whileHover={{ x: 5 }}
+              >
+                <Users className="w-5 h-5" /> WHO WE ARE
+              </motion.h3>
 
-<motion.div 
-  className="bg-dark-800/60 backdrop-blur-md p-6 rounded-2xl border border-blue-900/40 shadow-xl"
-  variants={itemVariants}
-  whileHover={{ scale: 1.03, boxShadow: '0 8px 32px 0 rgba(59,130,246,0.20)' }}
-  transition={{ type: 'spring', stiffness: 300 }}
->
-  <motion.h3 
-    className="text-lg md:text-xl font-bold text-blue-400 mb-4 flex items-center gap-2"
-    whileHover={{ x: 5 }}
-  >
-    <Users className="w-5 h-5" /> WHO WE ARE
-  </motion.h3>
-
-<motion.ul 
-  className="space-y-3 text-gray-300 text-sm sm:text-base leading-relaxed"
->
-  {[
-    {
-      text: "We’re a passionate tech team building future-ready IT solutions: consulting, apps, testing, and AI.",
-      desktop: "We're a team of passionate tech professionals focused on building a better future through smart and modern IT solutions. We offer IT consulting, website & mobile app development, software maintenance/testing, and AI integration.",
-      icon: <Users className="w-4 h-4 text-purple-400" />
-    },
-    {
-      text: "We use modern technology with agile methods to deliver quality projects on time.",
-      desktop: "We use the latest technology to build strong, flexible solutions for business needs. We follow agile and client-centric approaches to ensure every project meets deadlines without compromising quality.",
-      icon: <Code className="w-4 h-4 text-green-400" />
-    },
-    {
-      text: "We provide IT training & placements to help students and startups grow.",
-      desktop: "We provide IT training and placement support to help people get real-world skills and start their careers. Whether supporting students or helping startups grow, Sklassics turns ideas into reality and makes technology work for everyone.",
-      icon: <GraduationCap className="w-4 h-4 text-yellow-400" />
-    },
-    {
-      text: "We research emerging tech & build future-ready solutions for clients.",
-      desktop: "Our team continuously researches emerging technologies to keep solutions future-ready and competitive. We believe in long-term partnerships, offering ongoing support and optimization to help clients adapt and scale effortlessly.",
-      icon: <Rocket className="w-4 h-4 text-pink-400" />
-    }
-  ].map((item, index) => (
-    <motion.li key={index} className="flex items-start gap-3 p-3 rounded-lg bg-dark-700/30 border border-gray-700/30">
-      <motion.div className="p-2 rounded-full bg-purple-500/20 border border-purple-500/30">
-        {item.icon}
-      </motion.div>
-      {/* Mobile text vs desktop text */}
-      <span className="block sm:hidden">{item.text}</span>
-      <span className="hidden sm:block">{item.desktop}</span>
-    </motion.li>
-  ))}
-</motion.ul>
-
-</motion.div>
-
-          
-
+              <motion.ul className="space-y-3 text-gray-300 text-sm sm:text-base leading-relaxed">
+                {[
+                  {
+                    text: "We're a passionate tech team building future-ready IT solutions: consulting, apps, testing, and AI.",
+                    desktop: "We're a team of passionate tech professionals focused on building a better future through smart and modern IT solutions. We offer IT consulting, website & mobile app development, software maintenance/testing, and AI integration.",
+                    icon: <Users className="w-4 h-4 text-purple-400" />
+                  },
+                  {
+                    text: "We use modern technology with agile methods to deliver quality projects on time.",
+                    desktop: "We use the latest technology to build strong, flexible solutions for business needs. We follow agile and client-centric approaches to ensure every project meets deadlines without compromising quality.",
+                    icon: <Code className="w-4 h-4 text-green-400" />
+                  },
+                  {
+                    text: "We provide IT training & placements to help students and startups grow.",
+                    desktop: "We provide IT training and placement support to help people get real-world skills and start their careers. Whether supporting students or helping startups grow, Sklassics turns ideas into reality and makes technology work for everyone.",
+                    icon: <GraduationCap className="w-4 h-4 text-yellow-400" />
+                  },
+                  {
+                    text: "We research emerging tech & build future-ready solutions for clients.",
+                    desktop: "Our team continuously researches emerging technologies to keep solutions future-ready and competitive. We believe in long-term partnerships, offering ongoing support and optimization to help clients adapt and scale effortlessly.",
+                    icon: <Rocket className="w-4 h-4 text-pink-400" />
+                  }
+                ].map((item, index) => (
+                  <motion.li key={index} className="flex items-start gap-3 p-3 rounded-lg bg-dark-700/30 border border-gray-700/30">
+                    <motion.div className="p-2 rounded-full bg-purple-500/20 border border-purple-500/30">
+                      {item.icon}
+                    </motion.div>
+                    {/* Mobile text vs desktop text */}
+                    <span className="block sm:hidden">{item.text}</span>
+                    <span className="hidden sm:block">{item.desktop}</span>
+                  </motion.li>
+                ))}
+              </motion.ul>
+            </motion.div>
             
             {/* Right Column - OUR SERVICES */}
             <motion.div 
-              className="bg-dark-800/60 backdrop-blur-md p-6 rounded-2xl border border-blue-900/40 shadow-xl"
+              className="bg-dark-800/60 backdrop-blur-md p-4 sm:p-6 rounded-2xl border border-blue-900/40 shadow-xl"
               variants={itemVariants}
               whileHover={{ scale: 1.03, boxShadow: '0 8px 32px 0 rgba(59,130,246,0.20)' }}
               transition={{ type: 'spring', stiffness: 300 }}
@@ -267,7 +258,7 @@ const AboutCompany = () => {
               >
                 <Briefcase className="w-5 h-5" /> OUR SERVICES
               </motion.h3>
-              <motion.p className="text-gray-300 mb-4">We provide a comprehensive suite of offerings including:</motion.p>
+              <motion.p className="text-gray-300 mb-4 text-sm sm:text-base">We provide a comprehensive suite of offerings including:</motion.p>
               <motion.div 
                 className="grid grid-cols-1 md:grid-cols-2 gap-3"
                 initial={{ opacity: 0 }}
@@ -293,7 +284,7 @@ const AboutCompany = () => {
                 ].map((service, index) => (
                   <motion.div
                     key={index}
-                    className="flex items-center gap-3 p-3 rounded-lg bg-dark-700/30 border border-gray-700/30 hover:border-purple-500/50 transition-all duration-300 group"
+                    className="flex items-center gap-3 p-2 sm:p-3 rounded-lg bg-dark-700/30 border border-gray-700/30 hover:border-purple-500/50 transition-all duration-300 group"
                     initial={{ opacity: 0, x: -20 }}
                     animate={isVisible ? { opacity: 1, x: 0 } : {}}
                     transition={{ delay: 0.3 + index * 0.07 }}
@@ -304,14 +295,14 @@ const AboutCompany = () => {
                     }}
                   >
                     <motion.div
-                      className={`p-2 rounded-full bg-${service.color}-500/20 border border-${service.color}-500/30 group-hover:bg-${service.color}-500/30`}
+                      className={`p-1 sm:p-2 rounded-full bg-${service.color}-500/20 border border-${service.color}-500/30 group-hover:bg-${service.color}-500/30`}
                       whileHover={{ scale: 1.1, rotate: 5 }}
                       animate={{ scale: [1, 1.05, 1] }}
                       transition={{ duration: 2, repeat: Infinity, delay: index * 0.1 }}
                     >
-                      <service.icon className={`w-4 h-4 text-${service.color}-400`} />
+                      <service.icon className={`w-3 h-3 sm:w-4 sm:h-4 text-${service.color}-400`} />
                     </motion.div>
-                    <span className="text-sm text-gray-300 group-hover:text-white transition-colors">
+                    <span className="text-xs sm:text-sm text-gray-300 group-hover:text-white transition-colors">
                       {service.text}
                     </span>
                   </motion.div>
@@ -320,57 +311,52 @@ const AboutCompany = () => {
             </motion.div>
 
             {/* Bottom Left - OUR INITIATIVES */}
-            {/* Bottom Left - OUR INITIATIVES */}
-<motion.div 
-  className="bg-dark-800/60 backdrop-blur-md p-6 rounded-2xl border border-purple-900/40 shadow-xl"
-  variants={itemVariants}
-  whileHover={{ scale: 1.03, boxShadow: '0 8px 32px 0 rgba(168,85,247,0.25)' }}
-  transition={{ type: 'spring', stiffness: 300 }}
->
-  <motion.h3 
-    className="text-lg md:text-xl font-bold text-purple-400 mb-4 flex items-center gap-2"
-    whileHover={{ x: 5 }}
-  >
-    <Target className="w-5 h-5" /> OUR INITIATIVES
-  </motion.h3>
+            <motion.div 
+              className="bg-dark-800/60 backdrop-blur-md p-4 sm:p-6 rounded-2xl border border-purple-900/40 shadow-xl"
+              variants={itemVariants}
+              whileHover={{ scale: 1.03, boxShadow: '0 8px 32px 0 rgba(168,85,247,0.25)' }}
+              transition={{ type: 'spring', stiffness: 300 }}
+            >
+              <motion.h3 
+                className="text-lg md:text-xl font-bold text-purple-400 mb-4 flex items-center gap-2"
+                whileHover={{ x: 5 }}
+              >
+                <Target className="w-5 h-5" /> OUR INITIATIVES
+              </motion.h3>
 
-  <motion.ul className="space-y-3 text-gray-300 text-sm sm:text-base leading-relaxed">
-  {[
-    {
-      text: "End-to-end IT services that help individuals & businesses grow.",
-      desktop: "Deliver end-to-end IT services that empower individuals, startups, and businesses to grow through innovation, skill-building, and smart technology.",
-      icon: <Lightbulb className="w-4 h-4 text-yellow-400" />
-    },
-    {
-      text: "Simplifying digital transformation with training & AI solutions.",
-      desktop: "Simplify digital transformation with high-quality training, reliable job placement, and custom web, mobile, and AI solutions.",
-      icon: <Cpu className="w-4 h-4 text-blue-400" />
-    },
-    {
-      text: "Create real digital experiences that boost careers.",
-      desktop: "Create meaningful digital experiences that solve real-world problems and foster career success.",
-      icon: <Globe className="w-4 h-4 text-green-400" />
-    },
-    {
-      text: "Enabling long-term success for clients & learners.",
-      desktop: "Enable long-term progress for every client and learner we serve.",
-      icon: <Rocket className="w-4 h-4 text-pink-400" />
-    }
-  ].map((item, index) => (
-    <motion.li key={index} className="flex items-start gap-3 p-3 rounded-lg bg-dark-700/30 border border-gray-700/30">
-      <motion.div className="p-2 rounded-full bg-purple-500/20 border border-purple-500/30">
-        {item.icon}
-      </motion.div>
-      <span className="block sm:hidden">{item.text}</span>
-      <span className="hidden sm:block">{item.desktop}</span>
-    </motion.li>
-  ))}
-</motion.ul>
-
-
-
-</motion.div>
-
+              <motion.ul className="space-y-3 text-gray-300 text-sm sm:text-base leading-relaxed">
+                {[
+                  {
+                    text: "End-to-end IT services that help individuals & businesses grow.",
+                    desktop: "Deliver end-to-end IT services that empower individuals, startups, and businesses to grow through innovation, skill-building, and smart technology.",
+                    icon: <Lightbulb className="w-4 h-4 text-yellow-400" />
+                  },
+                  {
+                    text: "Simplifying digital transformation with training & AI solutions.",
+                    desktop: "Simplify digital transformation with high-quality training, reliable job placement, and custom web, mobile, and AI solutions.",
+                    icon: <Cpu className="w-4 h-4 text-blue-400" />
+                  },
+                  {
+                    text: "Create real digital experiences that boost careers.",
+                    desktop: "Create meaningful digital experiences that solve real-world problems and foster career success.",
+                    icon: <Globe className="w-4 h-4 text-green-400" />
+                  },
+                  {
+                    text: "Enabling long-term success for clients & learners.",
+                    desktop: "Enable long-term progress for every client and learner we serve.",
+                    icon: <Rocket className="w-4 h-4 text-pink-400" />
+                  }
+                ].map((item, index) => (
+                  <motion.li key={index} className="flex items-start gap-3 p-3 rounded-lg bg-dark-700/30 border border-gray-700/30">
+                    <motion.div className="p-2 rounded-full bg-purple-500/20 border border-purple-500/30">
+                      {item.icon}
+                    </motion.div>
+                    <span className="block sm:hidden">{item.text}</span>
+                    <span className="hidden sm:block">{item.desktop}</span>
+                  </motion.li>
+                ))}
+              </motion.ul>
+            </motion.div>
             
             {/* Bottom Right - Company Image */}
             <motion.div 
@@ -385,7 +371,7 @@ const AboutCompany = () => {
                 transition={{ type: 'spring', stiffness: 300 }}
               >
                 <motion.div 
-                  className="rounded-full bg-white p-4 w-64 h-64 flex items-center justify-center shadow-[0_0_30px_rgba(168,85,247,0.6)] backdrop-blur-sm border border-purple-500/30"
+                  className="rounded-full bg-white p-3 sm:p-4 w-56 h-56 sm:w-64 sm:h-64 flex items-center justify-center shadow-[0_0_30px_rgba(168,85,247,0.6)] backdrop-blur-sm border border-purple-500/30"
                   animate={{
                     boxShadow: [
                       "0 0 30px rgba(168, 85, 247, 0.6)",
@@ -398,14 +384,14 @@ const AboutCompany = () => {
                   <motion.img
                     src={sklassics_logo}
                     alt="Sklassics Technologies"
-                    className="w-56 h-56 object-contain rounded-full"
+                    className="w-48 h-48 sm:w-56 sm:h-56 object-contain rounded-full"
                     whileHover={{ rotate: 5 }}
                     transition={{ type: 'spring', stiffness: 300 }}
                   />
                 </motion.div>
                 
                 <motion.div 
-                  className="absolute bottom-4 right-4 bg-black/80 backdrop-blur-sm border border-purple-500 text-xs px-4 py-2 rounded-full text-white flex items-center gap-2"
+                  className="absolute bottom-2 right-2 sm:bottom-4 sm:right-4 bg-black/80 backdrop-blur-sm border border-purple-500 text-xs px-3 py-1 sm:px-4 sm:py-2 rounded-full text-white flex items-center gap-2"
                   whileHover={{ scale: 1.1 }}
                   transition={{ type: 'spring', stiffness: 300 }}
                 >
@@ -419,12 +405,12 @@ const AboutCompany = () => {
                 
                 {/* Floating Elements */}
                 <motion.div
-                  className="absolute -top-4 -right-4 w-8 h-8 bg-purple-400/80 rounded-full"
+                  className="absolute -top-2 -right-2 sm:-top-4 sm:-right-4 w-6 h-6 sm:w-8 sm:h-8 bg-purple-400/80 rounded-full"
                   animate={{ y: [0, -10, 0], rotate: [0, 360] }}
                   transition={{ duration: 3, repeat: Infinity }}
                 />
                 <motion.div
-                  className="absolute -bottom-4 -left-4 w-6 h-6 bg-blue-400/80 rounded-full"
+                  className="absolute -bottom-2 -left-2 sm:-bottom-4 sm:-left-4 w-5 h-5 sm:w-6 sm:h-6 bg-blue-400/80 rounded-full"
                   animate={{ y: [0, 10, 0], scale: [1, 1.2, 1] }}
                   transition={{ duration: 4, repeat: Infinity, delay: 1 }}
                 />
@@ -435,7 +421,7 @@ const AboutCompany = () => {
 
         {/* Enhanced Footer */}
         <motion.div 
-          className="mt-12 flex justify-between text-xs text-gray-600 border-t border-gray-800 pt-4"
+          className="mt-8 sm:mt-12 flex justify-between text-xs text-gray-600 border-t border-gray-800 pt-4"
           initial={{ opacity: 0, y: 20 }}
           animate={isVisible ? { opacity: 1, y: 0 } : {}}
           transition={{ delay: 1 }}

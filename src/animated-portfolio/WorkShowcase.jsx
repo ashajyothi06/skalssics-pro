@@ -1,6 +1,13 @@
 import React, { useState } from "react";
-import ai_inter from "../assets/ai_inter.gif";
-import car from "../assets/car.gif"; // Assuming you have this image in your assets
+import ai_inter from "../assets/5.png";
+
+import loan from "../assets/2.png";
+import travel from "../assets/3.png";
+import quiz from "../assets/4.png";
+import real from "../assets/1.png";
+import tutor from "../assets/6.png";
+import ITService from "../assets/7.png";
+import ITTraining from "../assets/8.png";
 
 const works = [
   {
@@ -11,55 +18,43 @@ const works = [
   },
   {
     id: 2,
-    image: car,
+    image:travel,
     hoverText:
       "Hanuman Car Rental is a full-fledged car booking solution that streamlines both customer and admin experiences.",
   },
   {
     id: 3,
-    image: "https://framerusercontent.com/images/fwGDNPhCZCyX8PlsEylNPGm27qQ.png?scale-down-to=1024",
+    image: tutor,
     hoverText:
       "Hanuman Car Rental is a full-fledged car booking solution that streamlines both customer and admin experiences.",
   },
   {
     id: 4,
-    image: "https://framerusercontent.com/images/EykVu3pj9zkotY7bzf2QCZjHjuQ.png?scale-down-to=102",
+    image:ITService,
     hoverText:
       "Hanuman Car Rental is a full-fledged car booking solution that streamlines both customer and admin experiences.",
   },
   {
     id: 5,
-    image: "https://framerusercontent.com/images/BTAv0a0yrLmuy4kkhV0wLsh3cc.png?scale-down-to=1024",
+    image:ITTraining,
     hoverText:
       "Hanuman Car Rental is a full-fledged car booking solution that streamlines both customer and admin experiences.",
   },
   {
     id: 6,
-    image: "https://framerusercontent.com/images/WwxfZAHzf8NOt7L4WHh5ik61JZ8.png?scale-down-to=1024",
+    image:real,
     hoverText:
       "Hanuman Car Rental is a full-fledged car booking solution that streamlines both customer and admin experiences.",
   },
   {
     id: 7,
-    image: "https://framerusercontent.com/images/TgEDTV6rBox0uL9kYl4TAj3q0.png?scale-down-to=1024",
+    image:loan,
     hoverText:
       "Hanuman Car Rental is a full-fledged car booking solution that streamlines both customer and admin experiences.",
   },
   {
     id: 8,
-    image: "https://framerusercontent.com/images/RuzIWl0Azju06LF1izlciX2k.png?scale-down-to=1024",
-    hoverText:
-      "Hanuman Car Rental is a full-fledged car booking solution that streamlines both customer and admin experiences.",
-  },
-  {
-    id: 9,
-    image: "https://framerusercontent.com/images/33oivZCyqPvtv4fCgpIL9kNI2GY.png?scale-down-to=1024",
-    hoverText:
-      "Hanuman Car Rental is a full-fledged car booking solution that streamlines both customer and admin experiences.",
-  },
-  {
-    id: 10,
-    image: "https://framerusercontent.com/images/IWQPmnzhZun3YbLslS2CnjAf5Q.png?scale-down-to=1024",
+    image: quiz,
     hoverText:
       "Hanuman Car Rental is a full-fledged car booking solution that streamlines both customer and admin experiences.",
   },

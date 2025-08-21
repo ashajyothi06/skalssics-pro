@@ -25,37 +25,37 @@ const works = [
     id: 3,
     image: tutor,
     hoverText:
-      "Hanuman Car Rental is a full-fledged car booking solution that streamlines both customer and admin experiences.",
+      "Sklassics Tutoring is a comprehensive learning platform that simplifies access to both online and offline tutoring, making it easier for students to connect with expert tutors while ensuring smooth management for educators.",
   },
   {
     id: 4,
     image:ITService,
     hoverText:
-      "Hanuman Car Rental is a full-fledged car booking solution that streamlines both customer and admin experiences.",
+      "Sklassics IT Services is an end-to-end technology solution provider that enhances business efficiency with seamless IT support, infrastructure management, and digital transformation services tailored to clients needs.",
   },
   {
     id: 5,
     image:ITTraining,
     hoverText:
-      "Hanuman Car Rental is a full-fledged car booking solution that streamlines both customer and admin experiences.",
+      "Sklassics IT Training is a complete training solution designed to upskill learners with hands-on IT courses, offering a smooth experience for students and streamlined tools for trainers and institutions.",
   },
   {
     id: 6,
     image:real,
     hoverText:
-      "Hanuman Car Rental is a full-fledged car booking solution that streamlines both customer and admin experiences.",
+      "vijayalakshmi real estate is a complete real estate platform that makes property search, booking, and management effortless for customers, while equipping agents and admins with streamlined tools for listings and transactions.",
   },
   {
     id: 7,
     image:loan,
     hoverText:
-      "Hanuman Car Rental is a full-fledged car booking solution that streamlines both customer and admin experiences.",
+      "Loan Management is a full-scale financial solution that simplifies loan processing, repayments, and tracking for customers while providing administrators with efficient control and real-time insights.",
   },
   {
     id: 8,
     image: quiz,
     hoverText:
-      "Hanuman Car Rental is a full-fledged car booking solution that streamlines both customer and admin experiences.",
+      "QuizMaster is an engaging quiz application that delivers an interactive learning and assessment experience for users while offering admins powerful tools for question management, scoring, and analytics.",
   },
 ];
 

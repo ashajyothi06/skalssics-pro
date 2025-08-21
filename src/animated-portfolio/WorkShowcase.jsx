@@ -1,13 +1,12 @@
 import React, { useState } from "react";
 import ai_inter from "../assets/5.png";
-
 import loan from "../assets/2.png";
 import travel from "../assets/3.png";
 import quiz from "../assets/4.png";
 import real from "../assets/1.png";
 import tutor from "../assets/6.png";
 import ITService from "../assets/7.png";
-import ITTraining from "../assets/8.png";
+import ITTraining from "../assets/ITTraining.png";
 
 const works = [
   {

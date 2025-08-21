@@ -14,6 +14,21 @@ import hanuman from '../assets/hanumancars.jpg';
 import ITServices from '../assets/ITServices.jpg';
 import Quiz from '../assets/Quiz.jpg';
 
+import hanuman11 from "../assets/hanuman11.jpg";
+import learnms from "../assets/learnms.png";
+import Netflix from "../assets/Netflix.png";
+import portfolio from "../assets/portfolio.png";
+import finance from "../assets/finance.png";
+import travel from "../assets/travel.png";
+import screw from "../assets/screw.png";
+import resturant from "../assets/resturant.png";
+import trae1 from "../assets/trae1.png";
+import business from "../assets/business.png";
+import ecommerce from "../assets/ecommerce.png";
+import sklassics from "../assets/sklassics.png";
+
+
+
 
 /* ---------- Styles (inline) ---------- */
 const styles = `
@@ -293,45 +308,77 @@ const SERVICES = [
 ];
 
 /* ---------- Sample Website Designs (12) ---------- */
+
 const designNames = [
-  "Modern Dashboard",
-  "Portfolio Showcase",
-  "E-commerce Landing",
-  "Blog Layout",
-  "Business Landing",
-  "Creative Agency",
-  "Restaurant Menu",
+  "Hanuman Cars",
+  "Learning Management System",
+  "SklassicsCom",
+  "Netflix Clone",
+  "Finance Recruitment",
+  "Portfolio",
   "Travel Explorer",
-  "Fitness Tracker",
-  "Educational Hub",
-  "Event Landing",
-  "Music Player UI"
+  "Restuarant",
+  "Trae-ai clone",
+  "ScrewFast",
+  "Businiess",
+  "Ecommerce website"
 ];
 
 const designDescs = [
-  "A sleek and modern dashboard layout with charts and stats.",
-  "Minimal portfolio with grid-based project previews.",
-  "Product-focused design with bold CTAs and shopping cart UI.",
-  "A clean blog layout with featured posts and categories.",
-  "Corporate-style landing page with service highlights.",
-  "Creative agency portfolio with animations.",
-  "Restaurant menu design with reservation feature.",
-  "Travel booking and exploration layout.",
-  "Fitness and workout tracker with progress charts.",
+  "Trusted dealership offering quality cars with reliable service and support.",
+  "A smart learning management system for schools, colleges, and corporates.",
+  "Innovative IT solutions provider delivering modern digital products and services.",
+  "A streaming platform replica featuring movies, series, and user-friendly browsing",
+  "A smart platform for managing money, investments, and financial insights",
+  "A modern personal portfolio showcasing projects, skills, and achievements",
+  "An interactive travel website for exploring destinations and planning trips.",
+  "A digital menu and booking system designed for modern dining experiences.",
+  "A fast and reliable service for hardware, tools, and industrial solutions",
   "E-learning hub with courses and progress tracking.",
-  "Event registration and agenda showcase.",
-  "Music player UI with playlists and controls."
+  "A professional business landing page highlighting services and growth",
+  "A sleek online store with seamless shopping and checkout experience."
 ];
 
+// ✅ Add unique links for each design
+const designLinks = [
+  "hanumancars.com",
+  "sklassics-lms.com",
+  "sklassics.com",
+  "https://ticky5.netlify.app/",
+  "https://sklassicsfinance.netlify.app/",
+  "https://sklassicsportfolio1.netlify.app/",
+  "https://sklassicstravels.netlify.app/",
+  "https://sklassicsrestaurant.netlify.app/",
+  "https://sklassicscrea.netlify.app/",
+  "https://sklassicsscrew.netlify.app/",
+  "https://sklassicsbusiness1.netlify.app/",
+  "https://ecommerce-two-pink-84.vercel.app/"
+];
+const designImages = [
+  hanuman11,
+  learnms,
+  sklassics,
+  Netflix,
+  finance,
+  portfolio,
+  travel,
+  resturant,
+  trae1,
+  screw,
+  business,
+  ecommerce
+];
 
 
 const DESIGNS = Array.from({ length: 12 }, (_, i) => ({
   id: i + 1,
   name: designNames[i],
-  img: `https://picsum.photos/seed/design${i + 1}/1200/675`,
+  img: designImages[i],   // ✅ individual photo for each design
   desc: designDescs[i],
-  link: "https://sklassicstech.com"
+  link: designLinks[i]
 }));
+
+
 
 /* ---------- Component ---------- */
 export default function ProjectViewNew() {
@@ -519,7 +566,7 @@ export default function ProjectViewNew() {
                       <span className="badge">{ICONS.external}</span>
                       Open Design
                     </a>
-                    <span className="mini">sklassicstech.com</span>
+                
                   </div>
                 </div>
               </article>
